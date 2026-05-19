@@ -1,4 +1,4 @@
-import { MonthMiniCalendar } from '../molecules/MonthMiniCalendar'
+import { MonthCalendar } from '../molecules/MonthCalendar'
 import { NavigationControls } from '../molecules/NavigationControls'
 
 interface IYearCalendarProps {
@@ -21,11 +21,12 @@ export function YearCalendar({ year, taskCountByDate = {}, onPrevYear, onNextYea
       </div>
       <div className="grid grid-cols-2 gap-4">
         {Array.from({ length: 12 }, (_, month) => (
-          <MonthMiniCalendar
+          <MonthCalendar
             key={month}
             year={year}
             month={month}
             taskCountByDate={taskCountByDate}
+            labelFormat='short'
           />
         ))}
       </div>

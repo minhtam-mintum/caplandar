@@ -1,35 +1,57 @@
 import { CalendarDayCell } from '../atoms/CalendarDayCell';
 import { DayLabel } from '../atoms/DayLabel';
 import {
-  DAY_LABELS,
+  type DayLabelFormat,
+  getDayLabels,
   getDaysInMonth,
   getFirstDayOfMonth,
   isToday,
   MONTH_NAMES,
   toDateStr,
+  WeekStart,
 } from '../../utils/calendar';
+import { cn } from '../../utils/cn';
 
-interface IMonthMiniCalendarProps {
+interface IMonthCalendarProps {
   year: number;
   month: number;
   taskCountByDate?: Record<string, number>;
+  labelFormat?: DayLabelFormat;
+  weekStart?: WeekStart;
+  classDayLabel?: string;
+  classMonthName?: string;
+  hasMonthName?: boolean;
 }
 
-export function MonthMiniCalendar({ year, month, taskCountByDate = {} }: IMonthMiniCalendarProps) {
+export function MonthCalendar({
+  year,
+  month,
+  taskCountByDate = {},
+  labelFormat = 'min',
+  weekStart,
+  classDayLabel,
+  classMonthName,
+  hasMonthName = true,
+}: IMonthCalendarProps) {
+  const dayLabels = getDayLabels(labelFormat, weekStart);
   const daysInMonth = getDaysInMonth(year, month);
-  const firstDay = getFirstDayOfMonth(year, month);
+  const firstDay = getFirstDayOfMonth(year, month, weekStart);
+
   const cells: Array<{ day: number | null }> = [];
   for (let i = 0; i < firstDay; i++) cells.push({ day: null });
   for (let d = 1; d <= daysInMonth; d++) cells.push({ day: d });
-  // pad to complete last row
   while (cells.length % 7 !== 0) cells.push({ day: null });
 
   return (
     <div className='bg-surface-container-lowest rounded-lg p-3 flex flex-col gap-2'>
-      <h3 className='text-body-md font-semibold text-on-surface'>{MONTH_NAMES[month]}</h3>
+      {hasMonthName && (
+        <h3 className={cn('text-body-md font-semibold text-on-surface', classMonthName)}>
+          {MONTH_NAMES[month]}
+        </h3>
+      )}
       <div className='grid grid-cols-7 gap-px'>
-        {DAY_LABELS.map((label, i) => (
-          <DayLabel key={i} label={label} />
+        {dayLabels.map((label, i) => (
+          <DayLabel classDayLabel={classDayLabel} key={i} label={label} />
         ))}
         {cells.map((cell, i) =>
           cell.day === null ? (
