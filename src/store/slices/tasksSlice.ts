@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { generateSeedTasks } from '../../utils/seedData'
 
 export interface Task {
   id: string
@@ -12,7 +13,7 @@ interface TasksState {
 }
 
 const initialState: TasksState = {
-  items: [],
+  items: generateSeedTasks(new Date().getFullYear()),
 }
 
 const tasksSlice = createSlice({

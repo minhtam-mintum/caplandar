@@ -1,0 +1,21 @@
+@reference "../../../index.css";
+
+.base {
+  @apply inline-flex items-center gap-2 cursor-pointer transition-colors;
+}
+
+.primary {
+  @apply bg-primary text-on-primary hover:bg-primary/90 px-4 py-2 rounded-full text-body-md font-semibold;
+}
+
+.secondary {
+  @apply bg-surface-container text-on-surface hover:bg-surface-container-high px-4 py-2 rounded-full text-body-md;
+}
+
+.ghost {
+  @apply text-on-surface hover:bg-surface-container px-3 py-1.5 rounded-md text-body-md;
+}
+
+.icon {
+  @apply text-on-surface-variant hover:bg-surface-container p-2 rounded-full;
+}
