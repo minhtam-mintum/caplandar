@@ -6,6 +6,7 @@ import { LoadingView } from './pages/LoadingView'
 const YearView = lazy(() => import('./pages/YearView').then((m) => ({ default: m.YearView })))
 const MonthView = lazy(() => import('./pages/MonthView').then((m) => ({ default: m.MonthView })))
 const WeekView = lazy(() => import('./pages/WeekView').then((m) => ({ default: m.WeekView })))
+const DayView = lazy(() => import('./pages/DayView').then((m) => ({ default: m.DayView })))
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
           <Route path='/year' element={<YearView />} />
           <Route path='/month' element={<MonthView />} />
           <Route path='/week' element={<WeekView />} />
-          {/* /day page goes here */}
+          <Route path='/day' element={<DayView />} />
         </Routes>
       </Suspense>
     </div>
