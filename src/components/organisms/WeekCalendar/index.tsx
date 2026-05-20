@@ -14,7 +14,7 @@ import {
   getWeekDays,
   timeToOffset,
 } from 'app/utils/week';
-import { Button } from 'app/components/atoms/button';
+import { Button } from 'app/components/atoms/Button';
 import { WeekEventCard } from 'app/components/molecules/WeekEventCard';
 import { NavigationControls } from 'app/components/molecules/NavigationControls';
 

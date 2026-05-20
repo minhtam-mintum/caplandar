@@ -2,10 +2,10 @@ import { Bell, Calendar, CalendarDays, CalendarRange, LayoutGrid, Plus } from 'l
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from 'app/constants/route';
 import { Avatar } from 'app/components/atoms/Avatar';
-import { Button } from 'app/components/atoms/button';
+import { Button } from 'app/components/atoms/Button';
 import { Logo } from 'app/components/atoms/Logo';
 import { NavTabs, type NavTab } from 'app/components/molecules/NavTabs';
-import { SearchBar } from 'app/components/molecules/inputs/SearchBar';
+import { SearchBar } from 'app/components/molecules/Inputs/SearchBar';
 
 const CALENDAR_TABS: NavTab[] = [
   { id: ROUTES.YEAR, label: 'Year View', icon: <LayoutGrid size={14} /> },

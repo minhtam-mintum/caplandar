@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from 'app/components/atoms/button';
+import { Button } from 'app/components/atoms/Button';
 
 interface INavigationControlsProps {
   onPrev: () => void;

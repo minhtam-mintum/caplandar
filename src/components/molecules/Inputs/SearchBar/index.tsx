@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import { Input } from 'app/components/atoms/input';
+import { Input } from 'app/components/atoms/Input';
 
 interface ISearchBarProps {
   placeholder?: string;
