@@ -1,0 +1,24 @@
+import { Dispatch, forwardRef, SetStateAction, useImperativeHandle, useState } from 'react';
+export interface ITitleYearPageHandle {
+  setYear: Dispatch<SetStateAction<number>>;
+}
+export const TitleYearPage = forwardRef<ITitleYearPageHandle, { defaultYear: number }>(
+  function TitleYearPage({ defaultYear }, ref) {
+    const [year, setYear] = useState<number>(defaultYear);
+    useImperativeHandle(
+      ref,
+      () => ({
+        setYear,
+      }),
+      [],
+    );
+    return (
+      <div>
+        <h2 className='text-headline-lg text-on-surface'>{year}</h2>
+        <p className='text-body-md text-on-surface-variant'>Yearly Overview &amp; Heatmap</p>
+      </div>
+    );
+  },
+);
+
+export default TitleYearPage;

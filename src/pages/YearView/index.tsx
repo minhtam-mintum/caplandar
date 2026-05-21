@@ -1,13 +1,16 @@
 import { useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { YearCalendar, type IYearCalendarHandle } from 'app/components/molecules/YearCalendar';
+import { FullMonthInYear, type IFullMonthInYearHandle } from './components/FullMonthInYear';
 import { EventModal, type IEventModalHandle } from 'app/components/organisms/EventModal';
 import { Toolbar } from 'app/components/molecules/Toolbar';
 import type { RootState } from 'app/store';
+import { ITitleYearPageHandle, TitleYearPage } from './components/Title';
 
 export function YearView() {
-  const yearRef = useRef<IYearCalendarHandle>(null);
+  const defaultYear = new Date().getFullYear();
+  const yearRef = useRef<IFullMonthInYearHandle>(null);
   const modalRef = useRef<IEventModalHandle>(null);
+  const titleRef = useRef<ITitleYearPageHandle>(null);
   const tasks = useSelector((state: RootState) => state.tasks.items);
 
   const countByDate = useMemo(() => {
@@ -17,10 +20,14 @@ export function YearView() {
     }
     return map;
   }, [tasks]);
-
-  const handlePrev = () => yearRef.current?.onSetYear(yearRef.current.year - 1);
-  const handleNext = () => yearRef.current?.onSetYear(yearRef.current.year + 1);
-  const handleToday = () => yearRef.current?.onResetYear();
+  const handleSynce = (newYear: number) => {
+    if (!yearRef.current || !titleRef.current) return;
+    yearRef.current.onSetYear(newYear);
+    titleRef.current.setYear(newYear);
+  };
+  const handlePrev = () => handleSynce((yearRef.current?.year ?? defaultYear) - 1);
+  const handleNext = () => handleSynce((yearRef.current?.year ?? defaultYear) + 1);
+  const handleToday = () => handleSynce(defaultYear);
   const handleDaySelect = (date: string) => modalRef.current?.open({ date });
 
   return (
@@ -28,19 +35,17 @@ export function YearView() {
       <EventModal ref={modalRef} />
       <Toolbar
         align='end'
-        title={
-          <div>
-            <h2 className='text-headline-lg text-on-surface'>
-              {yearRef.current?.year ?? new Date().getFullYear()}
-            </h2>
-            <p className='text-body-md text-on-surface-variant'>Yearly Overview &amp; Heatmap</p>
-          </div>
-        }
+        title={<TitleYearPage defaultYear={defaultYear} ref={titleRef} />}
         onPrev={handlePrev}
         onNext={handleNext}
         onToday={handleToday}
       />
-      <YearCalendar ref={yearRef} countByDate={countByDate} onDaySelect={handleDaySelect} />
+      <FullMonthInYear
+        ref={yearRef}
+        defaultYear={defaultYear}
+        countByDate={countByDate}
+        onDaySelect={handleDaySelect}
+      />
     </main>
   );
 }

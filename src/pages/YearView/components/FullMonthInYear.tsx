@@ -1,21 +1,21 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { MonthCalendar } from 'app/components/molecules/MonthCalendar';
 
-export interface IYearCalendarHandle {
+export interface IFullMonthInYearHandle {
   onSetYear: (newYear: number) => void;
   /** Resets the displayed year back to `defaultYear` (falls back to the current year if `defaultYear` was not provided). */
   onResetYear: VoidFunction;
   year: number;
 }
 
-interface IYearCalendarProps {
+interface IFullMonthInYearProps {
   countByDate?: Record<string, number>;
   defaultYear?: number;
   onDaySelect?: (dateStr: string) => void;
 }
 
-export const YearCalendar = forwardRef<IYearCalendarHandle, IYearCalendarProps>(
-  function YearCalendar({ countByDate = {}, defaultYear = new Date().getFullYear(), onDaySelect }, ref) {
+export const FullMonthInYear = forwardRef<IFullMonthInYearHandle, IFullMonthInYearProps>(
+  function FullMonthInYear({ countByDate = {}, defaultYear = new Date().getFullYear(), onDaySelect }, ref) {
     const yearCursor = useRef(defaultYear);
     const [, forceUpdate] = useState(0);
 
