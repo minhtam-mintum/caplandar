@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef } from 'react';
 import { Bell, Calendar, CalendarDays, CalendarRange, LayoutGrid, Plus } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from 'app/constants/route';
@@ -7,7 +7,7 @@ import { Button } from 'app/components/atoms/Button';
 import { Logo } from 'app/components/atoms/Logo';
 import { NavTabs, type NavTab } from 'app/components/molecules/NavTabs';
 import { SearchBar } from 'app/components/molecules/Inputs/SearchBar';
-import { EventModal } from 'app/components/organisms/EventModal';
+import { EventModal, IEventModalHandle } from 'app/components/organisms/EventModal';
 
 const CALENDAR_TABS: NavTab[] = [
   { id: ROUTES.YEAR, label: 'Year View', icon: <LayoutGrid size={14} /> },
@@ -16,24 +16,15 @@ const CALENDAR_TABS: NavTab[] = [
   { id: ROUTES.DAY, label: 'Day View', icon: <Calendar size={14} /> },
 ];
 
-interface IAppHeaderProps {
-  onCreateTask?: () => void;
-}
-
-export function AppHeader({ onCreateTask }: IAppHeaderProps) {
+export function AppHeader() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [modalOpen, setModalOpen] = useState(false);
-
+  const eventModalRef = useRef<IEventModalHandle>(null);
   const activeView = CALENDAR_TABS.some((t) => t.id === pathname) ? pathname : ROUTES.MONTH;
 
   return (
     <>
-      <EventModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={(data) => { console.log('saved', data); setModalOpen(false); }}
-      />
+      <EventModal ref={eventModalRef} />
       <header className='sticky top-0 z-10 bg-surface-container-lowest border-b border-outline-variant'>
         <div className='max-w-360 mx-auto px-margin'>
           <div className='flex items-center gap-4 h-14'>
@@ -42,9 +33,13 @@ export function AppHeader({ onCreateTask }: IAppHeaderProps) {
               <SearchBar />
             </div>
             <div className='flex items-center gap-2 ml-auto shrink-0'>
-              <Button variant='primary' onClick={() => { onCreateTask?.(); setModalOpen(true); }}>
+              <Button
+                variant='primary'
+                onClick={() => {
+                  eventModalRef.current?.open();
+                }}>
                 <Plus size={15} />
-                Create Task
+                Create Event
               </Button>
               <Button variant='icon' aria-label='Notifications'>
                 <Bell size={18} />
