@@ -24,6 +24,7 @@ interface IMonthCalendarProps {
   classDayLabel?: string;
   classMonthName?: string;
   hasMonthName?: boolean;
+  highlightToday?: boolean;
   onDayClick?: (dateStr: string) => void;
 }
 export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProps>(
@@ -37,6 +38,7 @@ export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProp
       classDayLabel,
       classMonthName,
       hasMonthName = true,
+      highlightToday = true,
       onDayClick,
     }: IMonthCalendarProps,
     ref,
@@ -78,7 +80,7 @@ export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProp
                 key={i}
                 day={cell.day}
                 count={countByDate[toDateStr(year, month, cell.day)] ?? 0}
-                isToday={isToday(year, month, cell.day)}
+                isToday={highlightToday && isToday(year, month, cell.day)}
                 isSelected={!!defaultDate && toDateStr(defaultDate.getFullYear(), defaultDate.getMonth(), defaultDate.getDate()) === toDateStr(year, month, cell.day)}
                 isDisabled={!!minDate && toDateStr(year, month, cell.day) < minDate}
                 onClick={

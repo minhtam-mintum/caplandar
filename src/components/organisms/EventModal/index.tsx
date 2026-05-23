@@ -91,7 +91,7 @@ export const EventModal = forwardRef<IEventModalHandle, IEventModalProps>(functi
         footer={
           <div className='flex justify-end w-full'>
             <ButtonRHF form={FORM_ID} variant='primary'>
-              Save Changes
+              Create
             </ButtonRHF>
           </div>
         }>

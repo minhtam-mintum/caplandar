@@ -16,6 +16,10 @@
   @apply text-on-surface hover:bg-surface-container px-3 py-1.5 rounded-md text-body-md;
 }
 
+.tonal {
+  @apply bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-lg;
+}
+
 .icon {
   @apply text-on-surface-variant hover:bg-surface-container p-2 rounded-full;
 }

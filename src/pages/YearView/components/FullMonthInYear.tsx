@@ -48,6 +48,7 @@ export const FullMonthInYear = forwardRef<IFullMonthInYearHandle, IFullMonthInYe
             key={month}
             countByDate={countByDate}
             labelFormat='short'
+            highlightToday={false}
             onDayClick={onDaySelect}
           />
         ))}

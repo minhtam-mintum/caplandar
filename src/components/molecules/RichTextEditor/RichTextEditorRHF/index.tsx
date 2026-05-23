@@ -7,7 +7,8 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createParagraphNode, $getRoot } from 'lexical';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $createParagraphNode, $getRoot, $insertNodes } from 'lexical';
 import { useController, useFormContext } from 'react-hook-form';
 import { Label } from 'app/components/atoms/Label';
 import { EDITOR_THEME, EDITOR_NODES } from './const';
@@ -25,29 +26,29 @@ function SyncPlugin({ value, onChange }: ISyncPluginProps) {
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
-      const json = JSON.stringify(editorState.toJSON());
-      lastWrittenRef.current = json;
-      onChange(json);
+      editorState.read(() => {
+        const html = $generateHtmlFromNodes(editor);
+        lastWrittenRef.current = html;
+        onChange(html);
+      });
     });
   }, [editor, onChange]);
 
   useEffect(() => {
     if (value === lastWrittenRef.current) return;
     lastWrittenRef.current = value;
-    if (!value) {
-      editor.update(() => {
-        const root = $getRoot();
-        root.clear();
+    editor.update(() => {
+      const root = $getRoot();
+      root.clear();
+      if (!value) {
         root.append($createParagraphNode());
-      });
-    } else {
-      try {
-        const state = editor.parseEditorState(value);
-        editor.setEditorState(state);
-      } catch {
-        // invalid state — leave editor as-is
+      } else {
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(value, 'text/html');
+        const nodes = $generateNodesFromDOM(editor, dom);
+        $insertNodes(nodes);
       }
-    }
+    });
   }, [value, editor]);
 
   return null;
@@ -70,7 +71,7 @@ export function RichTextEditorRHF({ name, label, disabled }: IRichTextEditorRHFP
       throw error;
     },
     nodes: EDITOR_NODES,
-    editorState: field.value || null,
+    editorState: null,
   };
 
   return (
@@ -79,7 +80,7 @@ export function RichTextEditorRHF({ name, label, disabled }: IRichTextEditorRHFP
       <div className='border border-outline-variant rounded-xl overflow-hidden'>
         <LexicalComposer initialConfig={initialConfig}>
           <Toolbar disabled={disabled} />
-          <div className='relative'>
+          <div className='relative overflow-y-auto max-h-64'>
             <RichTextPlugin
               contentEditable={
                 <ContentEditable

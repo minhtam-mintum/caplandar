@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from 'app/constants/route';
 import { Avatar } from 'app/components/atoms/Avatar';
 import { Button } from 'app/components/atoms/Button';
+import { IconButton } from 'app/components/molecules/Buttons/IconButton';
 import { Logo } from 'app/components/atoms/Logo';
 import { NavTabs, type NavTab } from 'app/components/molecules/NavTabs';
 import { SearchBar } from 'app/components/molecules/Inputs/SearchBar';
@@ -41,9 +42,9 @@ export function AppHeader() {
                 <Plus size={15} />
                 Create Event
               </Button>
-              <Button variant='icon' aria-label='Notifications'>
+              <IconButton aria-label='Notifications'>
                 <Bell size={18} />
-              </Button>
+              </IconButton>
               <Avatar initials='MT' />
             </div>
           </div>
