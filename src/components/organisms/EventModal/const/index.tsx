@@ -39,8 +39,8 @@ export const eventModalSchema = yup.object({
   alert: yup
     .number()
     .oneOf([...ALERT_VALUES])
-    .required(),
-  label: yup.string().required(),
+    .required('Alert is a required field'),
+  label: yup.string().required('Label is a required field'),
   notes: yup.string().default(''),
 });
 

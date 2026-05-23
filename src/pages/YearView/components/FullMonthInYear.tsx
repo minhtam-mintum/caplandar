@@ -22,8 +22,6 @@ export const FullMonthInYear = forwardRef<IFullMonthInYearHandle, IFullMonthInYe
     const yearCursor = useRef(defaultYear);
     const [, forceUpdate] = useState(0);
 
-    const year = yearCursor.current;
-
     useImperativeHandle(
       ref,
       () => ({
@@ -48,7 +46,6 @@ export const FullMonthInYear = forwardRef<IFullMonthInYearHandle, IFullMonthInYe
         {Array.from({ length: 12 }, (_, month) => (
           <MonthCalendar
             key={month}
-            defaultDate={new Date(year, month)}
             countByDate={countByDate}
             labelFormat='short'
             onDayClick={onDaySelect}

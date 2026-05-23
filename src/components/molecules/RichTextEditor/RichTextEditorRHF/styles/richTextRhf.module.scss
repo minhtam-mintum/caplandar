@@ -1,0 +1,51 @@
+.textBold {
+  font-weight: bold;
+}
+
+.textItalic {
+  font-style: italic;
+}
+
+.textUnderline {
+  text-decoration: underline;
+}
+
+.listUl {
+  list-style-type: disc;
+  padding-left: 1rem;
+}
+
+.listOl {
+  list-style-type: decimal;
+  padding-left: 1rem;
+}
+
+.link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.textCode {
+  font-family: 'Fira Mono', 'Cascadia Code', monospace;
+  font-size: 0.875em;
+  background-color: var(--color-surface-container-highest, rgba(0, 0, 0, 0.08));
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+.codeBlock {
+  display: block;
+  font-family: 'Fira Mono', 'Cascadia Code', monospace;
+  font-size: 0.875em;
+  background-color: var(--color-surface-container-highest, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 0.25rem 0;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}

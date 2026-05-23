@@ -10,6 +10,7 @@ import {
 import { Check, ChevronDown } from 'lucide-react';
 import { useController, useFormContext } from 'react-hook-form';
 import { Label } from 'app/components/atoms/Label';
+
 type ItemOption = { option: ReactNode; value: string | number };
 export type SelectItem = ItemOption | { custom: ReactNode };
 
@@ -39,13 +40,23 @@ interface ISelectRHFProps {
 
 export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFProps) {
   const { control } = useFormContext();
-  const { field } = useController({ control, name });
+  const { field, fieldState } = useController({ control, name });
+
   const valueItems: ItemOption[] = options.filter(
     (item): item is { option: ReactNode; value: string | number } => 'value' in item,
   );
   const [items, setItem] = useState<ItemOption[]>(valueItems);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const didOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      didOpenRef.current = true;
+    } else if (didOpenRef.current) {
+      field.onBlur();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -70,7 +81,9 @@ export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFPr
 
   const selectedOption =
     items.find((item) => item.value === field.value)?.option ?? String(field.value ?? '');
-  console.log(selectedOption);
+
+  const errorMessage = fieldState.error?.message;
+
   return (
     <SelectContext.Provider value={{ setItem, select, close, items }}>
       <div ref={containerRef} className='flex flex-col gap-1 relative'>
@@ -79,7 +92,7 @@ export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFPr
           type='button'
           disabled={disabled}
           onClick={() => setIsOpen((o) => !o)}
-          className='flex items-center gap-3 bg-surface-container-low rounded-xl px-4 py-3 text-body-md text-on-surface disabled:opacity-50 disabled:cursor-default'>
+          className={`flex items-center gap-3 bg-surface-container-low rounded-xl px-4 py-3 text-body-md text-on-surface disabled:opacity-50 disabled:cursor-default ${errorMessage ? 'ring-1 ring-error' : ''}`}>
           {icon && <span className='text-on-surface-variant shrink-0'>{icon}</span>}
           <span className='flex-1 text-left'>{selectedOption}</span>
           <ChevronDown
@@ -87,6 +100,7 @@ export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFPr
             className={`text-on-surface-variant transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`}
           />
         </button>
+        {errorMessage && <p className='text-label-sm text-error'>{errorMessage}</p>}
 
         {isOpen && (
           <div className='absolute top-full left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg z-10 overflow-hidden flex flex-col'>

@@ -1,12 +1,10 @@
-import { useFormContext } from 'react-hook-form';
-import { Bold, Bell, Italic, Link2, List } from 'lucide-react';
-import { Label } from 'app/components/atoms/Label';
+import { Bell } from 'lucide-react';
 import { InputRHF } from 'app/components/molecules/Inputs/InputRHF';
 import { SelectRHF } from 'app/components/molecules/Selects/SelectRHF';
+import { RichTextEditorRHF } from 'app/components/molecules/RichTextEditor/RichTextEditorRHF';
 import { GroupPeriodDate } from './components/GroupPeriodDate';
 import { GroupPeriodTime } from './components/GroupPeriodTime';
 import { LabelSelect } from './components/LabelSelect';
-import type { EventFormData } from './const';
 import { ALERT_OPTIONS } from './const';
 
 interface IEventFieldsProps {
@@ -14,8 +12,6 @@ interface IEventFieldsProps {
 }
 
 export function EventFields({ canEditAll }: IEventFieldsProps) {
-  const { register } = useFormContext<EventFormData>();
-
   return (
     <div className='px-6 py-5 flex flex-col gap-5'>
       <InputRHF name='name' label='Name' disabled={!canEditAll} />
@@ -37,34 +33,7 @@ export function EventFields({ canEditAll }: IEventFieldsProps) {
         <LabelSelect disabled={!canEditAll} />
       </div>
 
-      <div className='flex flex-col gap-2'>
-        <Label className='uppercase tracking-widest'>Notes</Label>
-        <div className='border border-outline-variant rounded-xl overflow-hidden'>
-          <div className='flex items-center gap-0.5 px-3 py-2 border-b border-outline-variant bg-surface-container-low'>
-            {[
-              { Icon: Bold, title: 'Bold' },
-              { Icon: Italic, title: 'Italic' },
-              { Icon: List, title: 'List' },
-              { Icon: Link2, title: 'Link' },
-            ].map(({ Icon, title }) => (
-              <button
-                key={title}
-                type='button'
-                title={title}
-                className='p-1.5 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors'>
-                <Icon size={15} />
-              </button>
-            ))}
-          </div>
-          <textarea
-            {...register('notes')}
-            placeholder='Add notes…'
-            rows={5}
-            disabled={!canEditAll}
-            className='w-full px-4 py-3 text-body-md text-on-surface bg-transparent outline-none resize-none placeholder:text-on-surface-variant/50 disabled:opacity-50'
-          />
-        </div>
-      </div>
+      <RichTextEditorRHF name='notes' label='Notes' disabled={!canEditAll} />
     </div>
   );
 }
