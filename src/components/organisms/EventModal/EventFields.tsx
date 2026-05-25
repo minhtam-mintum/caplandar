@@ -7,18 +7,14 @@ import { GroupPeriodTime } from './components/GroupPeriodTime';
 import { LabelSelect } from './components/LabelSelect';
 import { ALERT_OPTIONS } from './const';
 
-interface IEventFieldsProps {
-  canEditAll: boolean;
-}
-
-export function EventFields({ canEditAll }: IEventFieldsProps) {
+export function EventFields() {
   return (
     <div className='px-6 py-5 flex flex-col gap-5'>
-      <InputRHF name='name' label='Name' disabled={!canEditAll} />
+      <InputRHF name='name' label='Name' />
 
       <div className='grid grid-cols-2 gap-x-3 gap-y-2'>
-        <GroupPeriodDate disabled={!canEditAll} />
-        <GroupPeriodTime disabled={!canEditAll} />
+        <GroupPeriodDate />
+        <GroupPeriodTime />
       </div>
 
       <div className='grid grid-cols-2 gap-3'>
@@ -27,13 +23,12 @@ export function EventFields({ canEditAll }: IEventFieldsProps) {
           label='Alert'
           options={ALERT_OPTIONS}
           icon={<Bell size={15} />}
-          disabled={!canEditAll}
         />
 
-        <LabelSelect disabled={!canEditAll} />
+        <LabelSelect />
       </div>
 
-      <RichTextEditorRHF name='notes' label='Notes' disabled={!canEditAll} />
+      <RichTextEditorRHF name='notes' label='Notes' />
     </div>
   );
 }

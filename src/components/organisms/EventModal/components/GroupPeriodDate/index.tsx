@@ -24,13 +24,17 @@ export function GroupPeriodDate({ disabled }: IGroupPeriodDateProps) {
   return (
     <>
       <div className='flex flex-col gap-1'>
-        <Label>Starts</Label>
+        <Label>Start Date</Label>
         <DatePickerRHF name='startDate' disabled={disabled} />
       </div>
 
       <div className='flex flex-col gap-1'>
-        <Label>Ends</Label>
-        <DatePickerRHF name='endDate' disabled={disabled} minDate={startDate instanceof Date ? startDate : undefined} />
+        <Label>End Date</Label>
+        <DatePickerRHF
+          name='endDate'
+          disabled={disabled}
+          minDate={startDate instanceof Date ? startDate : undefined}
+        />
       </div>
     </>
   );

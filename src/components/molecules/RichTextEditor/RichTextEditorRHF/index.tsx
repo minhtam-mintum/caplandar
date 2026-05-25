@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -6,53 +5,12 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
-import { $createParagraphNode, $getRoot, $insertNodes } from 'lexical';
 import { useController, useFormContext } from 'react-hook-form';
 import { Label } from 'app/components/atoms/Label';
 import { EDITOR_THEME, EDITOR_NODES } from './const';
 import { Toolbar } from './components/Toolbar';
 import { LinkClickPlugin } from './components/Plugins/LinkClickPlugin';
-
-interface ISyncPluginProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-function SyncPlugin({ value, onChange }: ISyncPluginProps) {
-  const [editor] = useLexicalComposerContext();
-  const lastWrittenRef = useRef<string>(value);
-
-  useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        const html = $generateHtmlFromNodes(editor);
-        lastWrittenRef.current = html;
-        onChange(html);
-      });
-    });
-  }, [editor, onChange]);
-
-  useEffect(() => {
-    if (value === lastWrittenRef.current) return;
-    lastWrittenRef.current = value;
-    editor.update(() => {
-      const root = $getRoot();
-      root.clear();
-      if (!value) {
-        root.append($createParagraphNode());
-      } else {
-        const parser = new DOMParser();
-        const dom = parser.parseFromString(value, 'text/html');
-        const nodes = $generateNodesFromDOM(editor, dom);
-        $insertNodes(nodes);
-      }
-    });
-  }, [value, editor]);
-
-  return null;
-}
+import { SyncPlugin } from './components/Plugins/SyncPlugin';
 
 interface IRichTextEditorRHFProps {
   name: string;

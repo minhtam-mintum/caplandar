@@ -1,6 +1,7 @@
 import { forwardRef, type ForwardedRef, type ReactNode, useImperativeHandle } from 'react';
 import {
   type DefaultValues,
+  type FieldErrors,
   type FieldValues,
   FormProvider,
   type Mode,
@@ -22,6 +23,7 @@ interface IFormProps<T extends FieldValues> {
   schema: ObjectSchema<AnyObject>;
   defaultValues?: DefaultValues<T>;
   onSubmit: SubmitHandler<T>;
+  onSubmitError?: (errors: FieldErrors<T>) => void;
   id?: string;
   mode?: Mode;
   className?: string;
@@ -29,7 +31,16 @@ interface IFormProps<T extends FieldValues> {
 }
 
 function FormInner<T extends FieldValues>(
-  { schema, defaultValues, onSubmit, id, mode = 'all', className, children }: IFormProps<T>,
+  {
+    schema,
+    defaultValues,
+    onSubmit,
+    onSubmitError,
+    id,
+    mode = 'all',
+    className,
+    children,
+  }: IFormProps<T>,
   ref: ForwardedRef<IFormHandle<T>>,
 ) {
   const methods = useForm<T>({
@@ -37,12 +48,10 @@ function FormInner<T extends FieldValues>(
     defaultValues,
     mode,
   });
-
   useImperativeHandle(ref, () => ({ ...methods }), [methods]);
-
   return (
     <FormProvider {...methods}>
-      <form id={id} className={className} onSubmit={methods.handleSubmit(onSubmit)}>
+      <form id={id} className={className} onSubmit={methods.handleSubmit(onSubmit, onSubmitError)}>
         {children}
       </form>
     </FormProvider>

@@ -28,7 +28,7 @@ export function DatePickerRHF({
   const { field } = useController({ control, name });
   const { errors, touchedFields, isSubmitted } = useFormState({ name });
   const errorMessage =
-    (touchedFields[name] || isSubmitted) ? (errors[name]?.message as string | undefined) : undefined;
+    touchedFields[name] || isSubmitted ? (errors[name]?.message as string | undefined) : undefined;
 
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,11 +77,7 @@ export function DatePickerRHF({
 
       {isOpen && (
         <div className='absolute top-full left-0 mt-1 z-20 shadow-lg rounded-xl overflow-hidden bg-surface-container-lowest border border-outline-variant p-3 w-80'>
-          <Calendar
-            defaultDate={defaultDate}
-            minDate={minDate}
-            onDayClick={handleDayClick}
-          />
+          <Calendar defaultDate={defaultDate} minDate={minDate} onDayClick={handleDayClick} />
         </div>
       )}
     </div>

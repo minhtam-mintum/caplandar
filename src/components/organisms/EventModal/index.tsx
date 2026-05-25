@@ -1,39 +1,42 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { CalendarDays, Pencil } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import { Modal } from 'app/components/molecules/Modal';
 import { Form, type IFormHandle } from 'app/components/molecules/Form';
 import { ButtonRHF } from 'app/components/molecules/Buttons/ButtonRHF';
 import { useEvents } from 'app/hooks/useEvents';
 import { eventModalSchema, type EventFormData } from './const';
 import { EventFields } from './EventFields';
+import { EventDetail } from './EventDetail';
 
 export type { EventFormData } from './const';
 
-const FORM_ID = 'event-modal-form';
-
 export interface IEventModalHandle {
-  open: (initialData?: Partial<EventFormData>) => void;
+  open: (initialData?: Partial<EventFormData>, id?: string) => void;
   close: () => void;
 }
 
 interface IEventModalProps {
   onClose?: () => void;
-  initialData?: Partial<EventFormData>;
 }
 
 export const EventModal = forwardRef<IEventModalHandle, IEventModalProps>(function EventModal(
-  { onClose: controlledOnClose, initialData },
+  { onClose: controlledOnClose },
   ref,
 ) {
-  const { addEvent } = useEvents();
+  const { addEvent, updateEvent } = useEvents();
   const [isOpen, setIsOpen] = useState(false);
-  const [canEdit, setCanEdit] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [openData, setOpenData] = useState<Partial<EventFormData> | undefined>(undefined);
+  const [openId, setOpenId] = useState<string | undefined>(undefined);
   const formRef = useRef<IFormHandle<EventFormData>>(null);
-
+  const formId = openId ?? crypto.randomUUID();
   useImperativeHandle(
     ref,
     () => ({
-      open: (data?) => {
+      open: (data?, id?) => {
+        setIsEditing(false);
+        setOpenData(data);
+        setOpenId(id);
         setIsOpen(true);
       },
       close: () => {
@@ -42,16 +45,10 @@ export const EventModal = forwardRef<IEventModalHandle, IEventModalProps>(functi
     }),
     [],
   );
-
-  const isDetail = !!initialData?.name;
-  const canEditAll = !isDetail || canEdit;
-
   useEffect(() => {
-    if (isOpen && initialData) {
-      formRef.current?.reset(initialData);
-      setCanEdit(false);
-    }
-  }, [isOpen]);
+    if (isEditing) formRef.current?.reset(openData);
+  }, [isEditing, openData]);
+  const isDetail = !!openData?.name;
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -61,19 +58,30 @@ export const EventModal = forwardRef<IEventModalHandle, IEventModalProps>(functi
   const onSubmit = (data: EventFormData) => {
     const start = data.startDate.getTime() + data.startTime;
     const end = data.endDate.getTime() + data.endTime;
-    addEvent({ id: crypto.randomUUID(), name: data.name, start, end, alert: data.alert, label: data.label, notes: data.notes });
+    const event = {
+      name: data.name,
+      start,
+      end,
+      alert: data.alert,
+      label: data.label,
+      notes: data.notes,
+    };
+    if (openId) {
+      updateEvent(openId, { id: openId, ...event });
+    } else {
+      addEvent({ id: crypto.randomUUID(), ...event });
+    }
     handleClose();
   };
 
-  const headerTitle = isDetail ? (initialData?.name ?? '') : 'New Event';
-
+  const headerTitle = isDetail ? (openData?.name ?? '') : 'New Event';
   return (
     <Form
       ref={formRef}
       schema={eventModalSchema}
-      defaultValues={initialData}
       onSubmit={onSubmit}
-      id={FORM_ID}>
+      onSubmitError={(e) => console.log('submit errors:', e)}
+      id={formId}>
       <Modal
         isOpen={isOpen}
         onClose={handleClose}
@@ -81,24 +89,34 @@ export const EventModal = forwardRef<IEventModalHandle, IEventModalProps>(functi
           <>
             <CalendarDays size={20} className='text-primary shrink-0' />
             <h2 className='flex-1 text-headline-md text-on-surface'>{headerTitle}</h2>
-            {isDetail && (
-              <button
-                type='button'
-                onClick={() => setCanEdit(true)}
-                className='p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors'>
-                <Pencil size={16} />
-              </button>
-            )}
           </>
         }
         footer={
-          <div className='flex justify-end w-full'>
-            <ButtonRHF form={FORM_ID} variant='primary'>
-              Create
-            </ButtonRHF>
-          </div>
+          isDetail && !isEditing ? undefined : (
+            <div className='flex justify-end gap-2 w-full'>
+              {isEditing && (
+                <button
+                  type='button'
+                  onClick={() => setIsEditing(false)}
+                  className='px-4 py-2 rounded-xl text-body-md text-on-surface-variant hover:bg-surface-container transition-colors'>
+                  Cancel
+                </button>
+              )}
+              <ButtonRHF
+                form={formId}
+                variant='primary'
+                requireDirty={!isDetail}
+                requireValid={!isDetail}>
+                {isDetail ? 'Save Changes' : 'Create'}
+              </ButtonRHF>
+            </div>
+          )
         }>
-        <EventFields canEditAll={canEditAll} />
+        {isDetail && !isEditing ? (
+          <EventDetail data={openData} onEdit={() => setIsEditing(true)} />
+        ) : (
+          <EventFields />
+        )}
       </Modal>
     </Form>
   );

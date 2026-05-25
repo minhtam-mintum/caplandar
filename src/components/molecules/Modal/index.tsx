@@ -2,6 +2,7 @@ import { type ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from 'app/utils/cn';
+import { lockScroll, unlockScroll } from 'app/utils/scrollLock';
 
 interface IModalProps {
   isOpen: boolean;
@@ -21,8 +22,10 @@ export function Modal({ isOpen, onClose, children, className, header, footer }: 
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (isOpen) {
+      lockScroll();
+      return unlockScroll;
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;

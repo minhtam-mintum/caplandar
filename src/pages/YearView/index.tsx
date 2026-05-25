@@ -1,9 +1,10 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { FullMonthInYear, type IFullMonthInYearHandle } from './components/FullMonthInYear';
 import { EventModal, type IEventModalHandle } from 'app/components/organisms/EventModal';
+import { DayDrawer, type IDayDrawerHandle } from 'app/components/organisms/DayDrawer';
 import { Toolbar } from 'app/components/molecules/Toolbar';
 import { HeatmapDay } from 'app/components/molecules/HeatmapDay';
-import { useEvents } from 'app/hooks/useEvents';
+import { useEvents, type IEvent } from 'app/hooks/useEvents';
 import { toDateStr } from 'app/utils/calendar';
 import { ITitleYearPageHandle, TitleYearPage } from './components/Title';
 
@@ -11,6 +12,7 @@ export function YearView() {
   const defaultYear = useRef(new Date().getFullYear()).current;
   const yearRef = useRef<IFullMonthInYearHandle>(null);
   const modalRef = useRef<IEventModalHandle>(null);
+  const drawerRef = useRef<IDayDrawerHandle>(null);
   const titleRef = useRef<ITitleYearPageHandle>(null);
   const { events } = useEvents();
 
@@ -33,11 +35,29 @@ export function YearView() {
       <HeatmapDay
         day={day}
         count={countByDate[toDateStr(year, month, day)] ?? 0}
-        onClick={() => modalRef.current?.open()}
+        onClick={() => drawerRef.current?.open(new Date(Date.UTC(year, month, day)))}
       />
     ),
     [countByDate],
   );
+
+  const handleAddEvent = useCallback((date: Date) => {
+    drawerRef.current?.close();
+    modalRef.current?.open({ startDate: date, endDate: date });
+  }, []);
+
+  const handleEventClick = useCallback((event: IEvent) => {
+    modalRef.current?.open({
+      name: event.name,
+      startDate: new Date(Math.floor(event.start / 86400000) * 86400000),
+      startTime: event.start % 86400000,
+      endDate: new Date(Math.floor(event.end / 86400000) * 86400000),
+      endTime: event.end % 86400000,
+      alert: event.alert,
+      label: event.label,
+      notes: event.notes,
+    }, event.id);
+  }, []);
 
   const handleSync = (newYear: number) => {
     if (!yearRef.current || !titleRef.current) return;
@@ -51,6 +71,7 @@ export function YearView() {
   return (
     <main className='max-w-360 mx-auto px-margin py-lg flex flex-col gap-6'>
       <EventModal ref={modalRef} />
+      <DayDrawer ref={drawerRef} events={events} onAddEvent={handleAddEvent} onEventClick={handleEventClick} />
       <Toolbar
         align='end'
         title={<TitleYearPage defaultYear={defaultYear} ref={titleRef} />}
