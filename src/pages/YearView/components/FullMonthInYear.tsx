@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState, type ReactNode } from 'react';
 import { MonthCalendar } from 'app/components/molecules/Calendar/MonthCalendar';
 
 export interface IFullMonthInYearHandle {
@@ -9,14 +9,14 @@ export interface IFullMonthInYearHandle {
 }
 
 interface IFullMonthInYearProps {
-  countByDate?: Record<string, number>;
   defaultYear?: number;
   onDaySelect?: (date: Date) => void;
+  renderDay?: (year: number, month: number, day: number) => ReactNode;
 }
 
 export const FullMonthInYear = forwardRef<IFullMonthInYearHandle, IFullMonthInYearProps>(
   function FullMonthInYear(
-    { countByDate = {}, defaultYear = new Date().getFullYear(), onDaySelect },
+    { defaultYear = new Date().getFullYear(), onDaySelect, renderDay },
     ref,
   ) {
     const yearCursor = useRef(defaultYear);
@@ -45,11 +45,12 @@ export const FullMonthInYear = forwardRef<IFullMonthInYearHandle, IFullMonthInYe
       <div className='grid grid-cols-4 gap-4'>
         {Array.from({ length: 12 }, (_, month) => (
           <MonthCalendar
-            key={month}
-            countByDate={countByDate}
+            key={yearCursor.current * 12 + month}
+            defaultDate={new Date(yearCursor.current, month, 1)}
             labelFormat='short'
             highlightToday={false}
             onDayClick={onDaySelect}
+            renderDay={renderDay}
           />
         ))}
       </div>

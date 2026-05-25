@@ -11,7 +11,7 @@ import {
   WeekStart,
 } from 'app/utils/calendar';
 import { cn } from 'app/utils/cn';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState, type ReactNode } from 'react';
 export interface IMonthCalendarHandle {
   updateDate: (newDate: Date) => void;
 }
@@ -26,6 +26,7 @@ interface IMonthCalendarProps {
   hasMonthName?: boolean;
   highlightToday?: boolean;
   onDayClick?: (date: Date) => void;
+  renderDay?: (year: number, month: number, day: number) => ReactNode;
 }
 export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProps>(
   function MonthCalendar(
@@ -40,6 +41,7 @@ export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProp
       hasMonthName = true,
       highlightToday = true,
       onDayClick,
+      renderDay,
     }: IMonthCalendarProps,
     ref,
   ) {
@@ -64,7 +66,11 @@ export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProp
     return (
       <div className='@container bg-surface-container-lowest rounded-lg p-3 flex flex-col gap-2'>
         {hasMonthName && (
-          <h3 className={cn('text-body-md @[320px]:text-body-lg font-semibold text-on-surface', classMonthName)}>
+          <h3
+            className={cn(
+              'text-body-md @[320px]:text-body-lg font-semibold text-on-surface',
+              classMonthName,
+            )}>
             {MONTH_NAMES[month]}
           </h3>
         )}
@@ -75,16 +81,26 @@ export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProp
           {cells.map((cell, i) =>
             cell.day === null ? (
               <div key={i} className='aspect-square' />
+            ) : renderDay ? (
+              <div key={i}>{renderDay(year, month, cell.day)}</div>
             ) : (
               <CalendarDayCell
                 key={i}
                 day={cell.day}
-                count={countByDate[toDateStr(year, month, cell.day)] ?? 0}
                 isToday={highlightToday && isToday(year, month, cell.day)}
-                isSelected={!!defaultDate && toDateStr(defaultDate.getFullYear(), defaultDate.getMonth(), defaultDate.getDate()) === toDateStr(year, month, cell.day)}
+                isSelected={
+                  !!defaultDate &&
+                  toDateStr(
+                    defaultDate.getFullYear(),
+                    defaultDate.getMonth(),
+                    defaultDate.getDate(),
+                  ) === toDateStr(year, month, cell.day)
+                }
                 isDisabled={!!minDate && new Date(Date.UTC(year, month, cell.day)) < minDate}
                 onClick={
-                  onDayClick ? () => onDayClick(new Date(Date.UTC(year, month, cell.day!))) : undefined
+                  onDayClick
+                    ? () => onDayClick(new Date(Date.UTC(year, month, cell.day!)))
+                    : undefined
                 }
               />
             ),
