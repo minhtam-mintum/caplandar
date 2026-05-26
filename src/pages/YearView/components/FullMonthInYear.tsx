@@ -42,13 +42,14 @@ export const FullMonthInYear = forwardRef<IFullMonthInYearHandle, IFullMonthInYe
     );
 
     return (
-      <div className='grid grid-cols-4 gap-4'>
+      <div className='grid grid-cols-4 gap-3.5'>
         {Array.from({ length: 12 }, (_, month) => (
           <MonthCalendar
             key={yearCursor.current * 12 + month}
             defaultDate={new Date(yearCursor.current, month, 1)}
             labelFormat='short'
             highlightToday={false}
+            classCard='border border-outline-variant rounded-[14px] p-[14px] pb-3 gap-2.5'
             onDayClick={onDaySelect}
             renderDay={renderDay}
           />

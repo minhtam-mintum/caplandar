@@ -1,7 +1,5 @@
-import { useMemo, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useRef } from 'react';
 import { EventModal, IEventModalHandle } from 'app/components/organisms/EventModal';
-import type { RootState } from 'app/store';
 import { Toolbar } from 'app/components/molecules/Toolbar';
 import { ITitleMonthPageHandle, TitleMonthPage } from './components/Title';
 import {
@@ -18,16 +16,6 @@ export function MonthView() {
   const modalRef = useRef<IEventModalHandle>(null);
   const titleRef = useRef<ITitleMonthPageHandle>(null);
   const dateCursor = useRef(defaultDate);
-  const tasks = useSelector((state: RootState) => state.tasks.items);
-
-  const countByDate = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const task of tasks) {
-      map[task.date] = (map[task.date] ?? 0) + 1;
-    }
-    return map;
-  }, [tasks]);
-
   const handleSync = (newDate: Date) => {
     dateCursor.current = newDate;
     monthRef.current?.updateDate(newDate);
@@ -60,7 +48,7 @@ export function MonthView() {
         labelFormat='full'
         ref={monthRef}
         defaultDate={defaultDate}
-        countByDate={countByDate}
+
       />
     </main>
   );

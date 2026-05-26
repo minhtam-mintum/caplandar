@@ -17,10 +17,10 @@ export interface IMonthCalendarHandle {
 }
 interface IMonthCalendarProps {
   defaultDate?: Date;
-  countByDate?: Record<string, number>;
   minDate?: Date;
   labelFormat?: DayLabelFormat;
   weekStart?: WeekStart;
+  classCard?: string;
   classDayLabel?: string;
   classMonthName?: string;
   hasMonthName?: boolean;
@@ -32,10 +32,10 @@ export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProp
   function MonthCalendar(
     {
       defaultDate,
-      countByDate = {},
       minDate,
       labelFormat = 'min',
       weekStart,
+      classCard,
       classDayLabel,
       classMonthName,
       hasMonthName = true,
@@ -64,7 +64,7 @@ export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProp
     while (cells.length % 7 !== 0) cells.push({ day: null });
 
     return (
-      <div className='@container bg-surface-container-lowest rounded-lg p-3 flex flex-col gap-2'>
+      <div className={cn('@container bg-surface-container-lowest rounded-lg p-3 flex flex-col gap-2', classCard)}>
         {hasMonthName && (
           <h3
             className={cn(
@@ -74,7 +74,7 @@ export const MonthCalendar = forwardRef<IMonthCalendarHandle, IMonthCalendarProp
             {MONTH_NAMES[month]}
           </h3>
         )}
-        <div className='grid grid-cols-7 gap-px'>
+        <div className='grid grid-cols-7 gap-0.5'>
           {dayLabels.map((label, i) => (
             <DayLabel classDayLabel={classDayLabel} key={i} label={label} />
           ))}

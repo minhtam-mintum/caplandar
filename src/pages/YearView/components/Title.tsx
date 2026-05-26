@@ -15,7 +15,7 @@ export const TitleYearPage = forwardRef<ITitleYearPageHandle, { defaultYear: num
     return (
       <div>
         <h2 className='text-headline-lg text-on-surface'>{year}</h2>
-        <p className='text-body-md text-on-surface-variant'>Yearly Overview &amp; Heatmap</p>
+        <p className='text-[15px] text-on-surface-variant mt-0.5'>Yearly Overview &amp; Heatmap</p>
       </div>
     );
   },

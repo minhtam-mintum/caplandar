@@ -16,11 +16,6 @@ export function SearchBar({
       placeholder={placeholder}
       onFocus={onFocus}
       startAdornment={<Search size={15} />}
-      endAdornment={
-        <kbd className='hidden sm:inline-flex items-center gap-0.5 text-label-sm border border-outline-variant rounded px-1.5 py-0.5'>
-          ⌘K
-        </kbd>
-      }
     />
   );
 }

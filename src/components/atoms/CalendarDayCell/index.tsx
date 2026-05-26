@@ -41,7 +41,7 @@ export function CalendarDayCell({
       onClick={isDisabled ? undefined : onClick}
       className={`relative flex flex-col items-center justify-center aspect-square rounded-sm ${bg} ${ringClass} ${isDisabled ? 'opacity-35 cursor-not-allowed' : onClick ? 'cursor-pointer hover:ring-2 hover:ring-primary/40 transition-shadow' : ''}`}>
       <span
-        className={`text-label-sm @[320px]:text-label-md leading-none ${text} ${isToday ? 'font-bold' : ''}`}>
+        className={`text-[13px] leading-none ${text} ${isToday ? 'font-bold' : ''}`}>
         {day}
       </span>
     </div>
