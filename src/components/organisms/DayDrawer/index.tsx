@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronRight, Plus, X } from 'lucide-react';
-import type { IEvent } from 'app/hooks/useEvents';
+import { ChevronRight, Plus } from 'lucide-react';
+import type { IEvent } from 'app/store/slices/eventSlice';
 import { DismissButton } from 'app/components/molecules/Buttons/DismissButton';
 import { DashedButton } from 'app/components/molecules/Buttons/DashedButton';
 import { MONTH_NAMES } from 'app/utils/calendar';
@@ -87,9 +87,7 @@ export const DayDrawer = forwardRef<IDayDrawerHandle, IDayDrawerProps>(function 
           <span className='text-body-md font-semibold text-on-surface-variant'>
             {date ? formatHeaderDate(date) : ''}
           </span>
-          <DismissButton type='button' onClick={() => setDate(null)}>
-            <X size={18} />
-          </DismissButton>
+          <DismissButton onClick={() => setDate(null)} />
         </div>
         <div className='h-px bg-outline-variant' />
 

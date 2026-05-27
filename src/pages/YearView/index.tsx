@@ -4,7 +4,8 @@ import { EventModal, type IEventModalHandle } from 'app/components/organisms/Eve
 import { DayDrawer, type IDayDrawerHandle } from 'app/components/organisms/DayDrawer';
 import { Toolbar } from 'app/components/molecules/Toolbar';
 import { HeatmapDay } from 'app/components/molecules/HeatmapDay';
-import { useEvents, type IEvent } from 'app/hooks/useEvents';
+import { useAppSelector } from 'app/store';
+import type { IEvent } from 'app/store/slices/eventSlice';
 import { toDateStr } from 'app/utils/calendar';
 import { ITitleYearPageHandle, TitleYearPage } from './components/Title';
 
@@ -14,7 +15,7 @@ export function YearView() {
   const modalRef = useRef<IEventModalHandle>(null);
   const drawerRef = useRef<IDayDrawerHandle>(null);
   const titleRef = useRef<ITitleYearPageHandle>(null);
-  const { events } = useEvents();
+  const events = useAppSelector((state) => state.events.items);
 
   const countByDate = useMemo(() => {
     const map: Record<string, number> = {};
@@ -48,6 +49,7 @@ export function YearView() {
 
   const handleEventClick = useCallback((event: IEvent) => {
     modalRef.current?.open({
+      id: event.id,
       name: event.name,
       startDate: new Date(Math.floor(event.start / 86400000) * 86400000),
       startTime: event.start % 86400000,
@@ -56,7 +58,7 @@ export function YearView() {
       alert: event.alert,
       label: event.label,
       notes: event.notes,
-    }, event.id);
+    });
   }, []);
 
   const handleSync = (newYear: number) => {
@@ -71,7 +73,12 @@ export function YearView() {
   return (
     <main className='max-w-360 mx-auto px-margin py-lg flex flex-col gap-6'>
       <EventModal ref={modalRef} />
-      <DayDrawer ref={drawerRef} events={events} onAddEvent={handleAddEvent} onEventClick={handleEventClick} />
+      <DayDrawer
+        ref={drawerRef}
+        events={events}
+        onAddEvent={handleAddEvent}
+        onEventClick={handleEventClick}
+      />
       <Toolbar
         align='end'
         title={<TitleYearPage defaultYear={defaultYear} ref={titleRef} />}

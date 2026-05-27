@@ -1,15 +1,17 @@
-import { Bell, Clock, Pencil, Tag } from 'lucide-react';
+import { Bell, Clock, Tag } from 'lucide-react';
 import { useLabels } from 'app/hooks/useLabels';
-import { OutlineButton } from 'app/components/molecules/Buttons/OutlineButton';
 import { formatDetailDate, formatTime } from 'app/utils/calendar';
 import { ALERT_OPTIONS, type EventFormData } from './const';
+import { useFormContext } from 'react-hook-form';
 
 interface IEventDetailProps {
-  onEdit: () => void;
   data: Partial<EventFormData>;
 }
 
-export function EventDetail({ onEdit, data }: IEventDetailProps) {
+export function EventDetail() {
+  const { getValues } = useFormContext();
+  console.log(getValues());
+  const data: Partial<EventFormData> = getValues();
   const { labels } = useLabels();
 
   const { startDate, startTime, endDate, endTime, label, alert, notes } = data;
@@ -85,11 +87,6 @@ export function EventDetail({ onEdit, data }: IEventDetailProps) {
           />
         </div>
       )}
-
-      <OutlineButton type='button' onClick={onEdit}>
-        <Pencil size={14} />
-        Edit
-      </OutlineButton>
     </div>
   );
 }

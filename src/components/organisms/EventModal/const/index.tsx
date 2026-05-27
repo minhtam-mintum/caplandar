@@ -44,7 +44,9 @@ export const eventModalSchema = yup.object({
   notes: yup.string().default(''),
 });
 
-export type EventFormData = yup.InferType<typeof eventModalSchema>;
+export interface EventFormData extends yup.InferType<typeof eventModalSchema> {
+  id?: string;
+}
 
 // ─── Label options ────────────────────────────────────────────────────────────
 
