@@ -1,8 +1,8 @@
 import { dayToDateStr } from 'app/pages/WeekView/utils';
 
-export const DAY_HOUR_HEIGHT = 80; // px — taller rows than week view
-export const DAY_START_HOUR = 8;
-export const DAY_END_HOUR = 20;
+export const DAY_HOUR_HEIGHT = 64; // px — matches week view row height
+export const DAY_START_HOUR = 0;
+export const DAY_END_HOUR = 24;
 
 export function formatHour24(h: number): string {
   return `${String(h).padStart(2, '0')}:00`;
