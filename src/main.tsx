@@ -6,6 +6,10 @@ import { store } from './store';
 import { router } from './routes';
 import './index.css';
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
