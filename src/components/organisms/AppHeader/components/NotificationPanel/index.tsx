@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Bell } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from 'app/store';
@@ -12,7 +12,8 @@ interface INotificationPanelProps {
   onEventClick: (data: Partial<EventFormData>) => void;
 }
 
-export function NotificationPanel({ onEventClick }: INotificationPanelProps) {
+export const NotificationPanel = memo(function NotificationPanel({ onEventClick }: INotificationPanelProps) {
+  console.log('NotificationPanel re-render');
   const dispatch = useAppDispatch();
   const events = useAppSelector((state) => state.events.items);
   const readIds = useAppSelector((state) => state.notifications.readIds);
@@ -124,4 +125,4 @@ export function NotificationPanel({ onEventClick }: INotificationPanelProps) {
         )}
     </>
   );
-}
+});
