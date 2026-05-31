@@ -5,6 +5,28 @@
 - Always use `interface` (not `type`) for component props.
 - Place the interface definition directly above the component, in the same file (unless explicitly shared).
 
+## File Structure Conventions
+
+### types.ts — non-component interfaces and types
+- All interfaces and types that live outside a component's scope MUST be extracted to a co-located `types.ts` file in the same directory.
+- The component props interface (e.g. `IButtonProps`) stays in the component file, directly above the component. Everything else (domain types, shared shapes, handler signatures) goes in `types.ts`.
+- Import from `./types` within the same folder.
+
+### utils.ts — out-of-scope functions
+- All pure functions defined outside a component's scope MUST be extracted to a co-located `utils.ts` file in the same directory.
+- Constants used only by those functions (lookup tables, magic values) move to `utils.ts` alongside them.
+- Import from `./utils` within the same folder.
+
+### src/utils — shared utilities
+- If a util function or type is reused by more than one feature/component, move it to `src/utils/` with an appropriate module name (e.g. `src/utils/time.ts`, `src/utils/html.ts`).
+- Use the `app/utils/*` absolute import alias when consuming shared utils.
+
+### Decision rule
+```
+used in one component folder  →  ./utils.ts  or  ./types.ts
+used across multiple features →  src/utils/<module>.ts
+```
+
 ### Examples
 - Component `Button` → `IButtonProps`
 - Component `UserCard` → `IUserCardProps`
