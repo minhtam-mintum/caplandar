@@ -20,8 +20,8 @@ export function ConfirmDelete({ renderFooter, id, onCancel, onClose }: IConfirmD
     onClose();
   };
   return (
-    <>
-      <div className='px-6 py-5'>
+    <div className='flex flex-col flex-1'>
+      <div className='px-6 py-5 flex-1'>
         <p className='text-body-md text-on-surface-variant'>
           This event will be permanently deleted. This action cannot be undone.
         </p>
@@ -40,6 +40,6 @@ export function ConfirmDelete({ renderFooter, id, onCancel, onClose }: IConfirmD
           </OutlineButton>
         </div>,
       )}
-    </>
+    </div>
   );
 }

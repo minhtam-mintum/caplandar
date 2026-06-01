@@ -26,8 +26,8 @@ export function EventDetail({ data, renderFooter, onEdit, onDelete }: IEventDeta
     startDate.getTime() === endDate.getTime();
 
   return (
-    <>
-      <div className='px-6 py-5 flex flex-col gap-6'>
+    <div className='flex flex-col flex-1 min-h-0'>
+      <div className='px-6 py-5 flex flex-col gap-6 overflow-y-auto flex-1'>
         {/* Time & date */}
         <div className='flex items-center gap-3 bg-surface-container rounded-xl px-4 py-3'>
           <Clock size={18} className='text-primary shrink-0' />
@@ -107,6 +107,6 @@ export function EventDetail({ data, renderFooter, onEdit, onDelete }: IEventDeta
           </OutlineButton>
         </div>,
       )}
-    </>
+    </div>
   );
 }
