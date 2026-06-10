@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from 'app/components/atoms/Button';
+import { GhostButton } from 'app/components/molecules/Buttons/GhostButton';
+import { IconButton } from 'app/components/molecules/Buttons/IconButton';
 
 interface INavigationControlsProps {
   onPrev: () => void;
@@ -10,15 +11,15 @@ interface INavigationControlsProps {
 export function NavigationControls({ onPrev, onNext, onToday }: INavigationControlsProps) {
   return (
     <div className='flex items-center gap-1'>
-      <Button variant='ghost' onClick={onToday} className='text-body-md'>
+      <GhostButton onClick={onToday} className='text-body-md'>
         Today
-      </Button>
-      <Button variant='icon' onClick={onPrev} aria-label='Previous'>
+      </GhostButton>
+      <IconButton onClick={onPrev} aria-label='Previous'>
         <ChevronLeft size={16} />
-      </Button>
-      <Button variant='icon' onClick={onNext} aria-label='Next'>
+      </IconButton>
+      <IconButton onClick={onNext} aria-label='Next'>
         <ChevronRight size={16} />
-      </Button>
+      </IconButton>
     </div>
   );
 }
