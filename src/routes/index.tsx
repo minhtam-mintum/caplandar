@@ -7,19 +7,37 @@ import { appRoutes } from './appRoutes';
 
 export const router = createBrowserRouter([
   {
-    path: ROUTES.ROOT,
-    element: <App />,
     HydrateFallback: LoadingPage,
     children: [
       {
-        element: <RouteLayout />,
+        path: ROUTES.ROOT,
+        element: <App />,
         children: [
-          { index: true, element: <Navigate to={ROUTES.MONTH} replace /> },
-          ...appRoutes.map(({ path, lazy }) => ({
-            path: path.slice(1),
-            lazy,
-          })),
+          {
+            element: <RouteLayout />,
+            children: [
+              { index: true, element: <Navigate to={ROUTES.MONTH} replace /> },
+              ...appRoutes.map(({ path, lazy }) => ({
+                path: path.slice(1),
+                lazy,
+              })),
+            ],
+          },
         ],
+      },
+      {
+        path: ROUTES.LOGIN,
+        lazy: async () => {
+          const { LoginPage } = await import('app/pages/LoginPage');
+          return { Component: LoginPage };
+        },
+      },
+      {
+        path: ROUTES.REGISTER,
+        lazy: async () => {
+          const { RegisterPage } = await import('app/pages/RegisterPage');
+          return { Component: RegisterPage };
+        },
       },
     ],
   },

@@ -3,10 +3,10 @@ import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from 'app/constants/route';
 import type { IEvent } from 'app/store/slices/eventSlice';
-import { Avatar } from 'app/components/atoms/Avatar';
 import { Button } from 'app/components/atoms/Button';
 import { Logo } from 'app/components/atoms/Logo';
 import { EventModal, IEventModalHandle, type EventFormData } from 'app/components/organisms/EventModal';
+import { AuthButton } from './components/AuthButton';
 import { CalendarNavTabs, type ICalendarNavTabsHandle } from './components/CalendarNavTabs';
 import { EventSearch } from './components/EventSearch';
 import { NotificationPanel } from './components/NotificationPanel';
@@ -59,7 +59,7 @@ export function AppHeader() {
                 Create Event
               </Button>
               <NotificationPanel onEventClick={handleEventClick} />
-              <Avatar initials='MT' />
+              <AuthButton />
             </div>
           </div>
           <div className='pb-0.5'>
