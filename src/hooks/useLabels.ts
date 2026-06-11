@@ -14,17 +14,20 @@ export function useLabels() {
   const isAuthenticated = !!user && !isAnonymous;
 
   const [labels, setLabels] = useState<ILabel[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
       setLabels([]);
       return;
     }
+    setIsLoading(true);
     apiGetLabels()
       .then((apiLabels) =>
         setLabels(apiLabels.map((l) => ({ value: l._id, name: l.name, color: l.color }))),
       )
-      .catch(() => setLabels([]));
+      .catch(() => setLabels([]))
+      .finally(() => setIsLoading(false));
   }, [isAuthenticated]);
 
   const addLabel = useCallback(
@@ -41,5 +44,5 @@ export function useLabels() {
     [isAuthenticated],
   );
 
-  return { labels, addLabel };
+  return { labels, addLabel, isLoading };
 }

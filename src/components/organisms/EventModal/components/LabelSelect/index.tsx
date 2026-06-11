@@ -8,7 +8,7 @@ interface ILabelSelectProps {
 }
 
 export function LabelSelect({ disabled }: ILabelSelectProps) {
-  const { labels, addLabel } = useLabels();
+  const { labels, addLabel, isLoading } = useLabels();
   return (
     <SelectRHF
       name='label'
@@ -16,6 +16,7 @@ export function LabelSelect({ disabled }: ILabelSelectProps) {
       options={buildLabelOptions(labels, addLabel)}
       icon={<Tag size={15} />}
       disabled={disabled}
+      loading={isLoading}
     />
   );
 }

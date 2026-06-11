@@ -7,7 +7,7 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Loader2 } from 'lucide-react';
 import { useController, useFormContext } from 'react-hook-form';
 import { ButtonField } from 'app/components/molecules/Buttons/ButtonField';
 import { Label } from 'app/components/atoms/Label';
@@ -37,9 +37,10 @@ interface ISelectRHFProps {
   icon?: ReactNode;
   disabled?: boolean;
   placeholder?: string;
+  loading?: boolean;
 }
 
-export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFProps) {
+export function SelectRHF({ name, label, options, icon, disabled, loading }: ISelectRHFProps) {
   const { control } = useFormContext();
   const { field, fieldState } = useController({ control, name });
 
@@ -91,15 +92,19 @@ export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFPr
         <ButtonField
           variant='field-trigger'
           type='button'
-          disabled={disabled}
+          disabled={disabled || loading}
           onClick={() => setIsOpen((o) => !o)}
           className={`bg-surface-container-low ${errorMessage ? 'ring-1 ring-error' : ''}`}>
           {icon && <span className='text-on-surface-variant shrink-0'>{icon}</span>}
           <span className='flex-1 text-left'>{selectedOption}</span>
-          <ChevronDown
-            size={15}
-            className={`text-on-surface-variant transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`}
-          />
+          {loading ? (
+            <Loader2 size={15} className='text-on-surface-variant animate-spin shrink-0' />
+          ) : (
+            <ChevronDown
+              size={15}
+              className={`text-on-surface-variant transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`}
+            />
+          )}
         </ButtonField>
         {errorMessage && <p className='text-label-sm text-error'>{errorMessage}</p>}
 
