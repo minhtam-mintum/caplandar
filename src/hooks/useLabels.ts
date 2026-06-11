@@ -1,47 +1,24 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useAppSelector } from 'app/store';
-import { apiGetLabels, apiCreateLabel } from 'app/services/api';
+import { useCallback, useEffect } from 'react';
+import { useAppSelector, useAppDispatch } from 'app/store';
+import { fetchLabelsThunk, addLabelThunk } from 'app/store/slices/labelSlice';
 
-export interface ILabel {
-  color: string;
-  name: string;
-  value: string;
-}
+export type { ILabel } from 'app/store/slices/labelSlice';
 
 export function useLabels() {
-  const user = useAppSelector((s) => s.auth.user);
-  const isAnonymous = useAppSelector((s) => s.auth.isAnonymous);
-  const isAuthenticated = !!user && !isAnonymous;
-
-  const [labels, setLabels] = useState<ILabel[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const labels = useAppSelector((s) => s.labels.items);
+  const isLoading = useAppSelector((s) => s.labels.loading);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setLabels([]);
-      return;
-    }
-    setIsLoading(true);
-    apiGetLabels()
-      .then((apiLabels) =>
-        setLabels(apiLabels.map((l) => ({ value: l._id, name: l.name, color: l.color }))),
-      )
-      .catch(() => setLabels([]))
-      .finally(() => setIsLoading(false));
-  }, [isAuthenticated]);
+    dispatch(fetchLabelsThunk());
+  }, [dispatch]);
 
   const addLabel = useCallback(
-    async (label: ILabel): Promise<ILabel> => {
-      if (!isAuthenticated) {
-        setLabels((prev) => [...prev, label]);
-        return label;
-      }
-      const created = await apiCreateLabel({ name: label.name, color: label.color });
-      const newLabel: ILabel = { value: created._id, name: created.name, color: created.color };
-      setLabels((prev) => [...prev, newLabel]);
-      return newLabel;
+    async (label: Parameters<typeof addLabelThunk>[0]) => {
+      const result = await dispatch(addLabelThunk(label));
+      return addLabelThunk.fulfilled.match(result) ? result.payload : label;
     },
-    [isAuthenticated],
+    [dispatch],
   );
 
   return { labels, addLabel, isLoading };

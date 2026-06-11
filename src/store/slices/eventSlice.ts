@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { IApiEvent } from 'app/services/api';
-import { apiCreateEvent, apiGetEvents } from 'app/services/api';
+import { apiCreateEvent, apiUpdateEvent, apiGetEvents } from 'app/services/api';
 
 import { setAuth, logout, setAnonymous } from './authSlice';
 
@@ -11,6 +11,8 @@ export interface IEvent {
   end: number;
   alert: number;
   label: string;
+  labelName?: string;
+  labelColor?: string;
   notes: string;
 }
 
@@ -28,13 +30,16 @@ function resolveLabelId(labelId: string | { _id: string } | undefined): string {
 }
 
 function mapApiEventToLocal(apiEvent: IApiEvent): IEvent {
+  const labelId = apiEvent.labelId;
   return {
     id: apiEvent._id,
     name: apiEvent.title,
     start: new Date(apiEvent.startDate).getTime(),
     end: new Date(apiEvent.endDate).getTime(),
     alert: 0,
-    label: resolveLabelId(apiEvent.labelId),
+    label: resolveLabelId(labelId),
+    labelName: typeof labelId === 'object' ? labelId.name : undefined,
+    labelColor: typeof labelId === 'object' ? labelId.color : undefined,
     notes: apiEvent.description ?? '',
   };
 }
@@ -93,6 +98,19 @@ export const createEventThunk = createAsyncThunk<
   return mapApiEventToLocal(apiEvent);
 });
 
+export const updateEventThunk = createAsyncThunk<
+  IEvent,
+  IEvent,
+  { state: { auth: AuthSliceState } }
+>('events/update', async (data, { getState }) => {
+  const { auth } = getState();
+  if (!auth.user || auth.isAnonymous) {
+    return data;
+  }
+  const apiEvent = await apiUpdateEvent(data.id, mapLocalToApiPayload(data));
+  return mapApiEventToLocal(apiEvent);
+});
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const initialState: IEventState = {
@@ -147,6 +165,10 @@ const eventSlice = createSlice({
       })
       .addCase(createEventThunk.fulfilled, (state, action) => {
         state.items.push(action.payload);
+      })
+      .addCase(updateEventThunk.fulfilled, (state, action) => {
+        const index = state.items.findIndex((e) => e.id === action.payload.id);
+        if (index !== -1) state.items[index] = action.payload;
       });
   },
 });

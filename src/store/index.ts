@@ -1,9 +1,10 @@
 import { configureStore, type Middleware } from '@reduxjs/toolkit';
 import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux';
-import eventReducer, { updateEvent, removeEvent, mapLocalToApiPayload } from './slices/eventSlice';
+import eventReducer, { removeEvent } from './slices/eventSlice';
 import notificationReducer, { NOTIFICATION_READ_KEY } from './slices/notificationSlice';
 import authReducer, { AUTH_STORAGE_KEY, updateTokens } from './slices/authSlice';
-import { apiUpdateEvent, apiDeleteEvent, setOnTokensRefreshed } from 'app/services/api';
+import labelReducer from './slices/labelSlice';
+import { apiDeleteEvent, setOnTokensRefreshed } from 'app/services/api';
 
 type SyncState = {
   auth: { user: { _id: string } | null; isAnonymous: boolean };
@@ -15,9 +16,6 @@ const apiSyncMiddleware: Middleware = (storeAPI) => (next) => (action) => {
 
   if (!state.auth.user || state.auth.isAnonymous) return result;
 
-  if (updateEvent.match(action)) {
-    apiUpdateEvent(action.payload.id, mapLocalToApiPayload(action.payload)).catch(console.error);
-  }
   if (removeEvent.match(action)) {
     apiDeleteEvent(action.payload as string).catch(console.error);
   }
@@ -30,6 +28,7 @@ export const store = configureStore({
     events: eventReducer,
     notifications: notificationReducer,
     auth: authReducer,
+    labels: labelReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSyncMiddleware),
 });

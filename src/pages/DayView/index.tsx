@@ -36,6 +36,8 @@ export function DayView() {
       endTime: event.end % 86400000,
       alert: event.alert,
       label: event.label,
+      labelName: event.labelName,
+      labelColor: event.labelColor,
       notes: event.notes,
     });
   }, []);

@@ -7,7 +7,7 @@ import { RichTextEditorRHF } from 'app/components/molecules/RichTextEditor/RichT
 import { ButtonRHF } from 'app/components/molecules/Buttons/ButtonRHF';
 import { CancelButton } from 'app/components/molecules/Buttons/CancelButton';
 import { useAppDispatch } from 'app/store';
-import { updateEvent, createEventThunk } from 'app/store/slices/eventSlice';
+import { updateEventThunk, createEventThunk } from 'app/store/slices/eventSlice';
 import { GroupPeriodDate } from 'app/components/organisms/EventModal/components/GroupPeriodDate';
 import { GroupPeriodTime } from 'app/components/organisms/EventModal/components/GroupPeriodTime';
 import { LabelSelect } from 'app/components/organisms/EventModal/components/LabelSelect';
@@ -46,9 +46,9 @@ export function EventFields({
       notes: data.notes,
     };
     if (data.id) {
-      dispatch(updateEvent({ id: data.id, ...eventData }));
+      await dispatch(updateEventThunk({ id: data.id, ...eventData })).unwrap();
     } else {
-      await dispatch(createEventThunk(eventData));
+      await dispatch(createEventThunk(eventData)).unwrap();
     }
     onClose();
   };

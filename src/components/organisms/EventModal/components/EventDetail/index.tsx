@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { Bell, Clock, Pencil, Tag, Trash2 } from 'lucide-react';
-import { useLabels } from 'app/hooks/useLabels';
 import { formatDetailDate, formatTime } from 'app/utils/calendar';
 import { OutlineButton } from 'app/components/molecules/Buttons/OutlineButton';
 import { ALERT_OPTIONS, type EventFormData } from 'app/components/organisms/EventModal/const';
@@ -13,12 +12,9 @@ interface IEventDetailProps {
 }
 
 export function EventDetail({ data, renderFooter, onEdit, onDelete }: IEventDetailProps) {
-  const { labels } = useLabels();
-
-  const { startDate, startTime, endDate, endTime, label, alert, notes } = data;
+  const { startDate, startTime, endDate, endTime, labelName, labelColor, alert, notes } = data;
 
   const alertOption = ALERT_OPTIONS.find((o) => 'value' in o && o.value === alert);
-  const labelData = labels.find((l) => l.value === label);
 
   const sameDay =
     startDate instanceof Date &&
@@ -52,14 +48,14 @@ export function EventDetail({ data, renderFooter, onEdit, onDelete }: IEventDeta
 
         {/* Label + Alert */}
         <div className='grid grid-cols-2 gap-4'>
-          {labelData && (
+          {labelName && (
             <div className='flex flex-col gap-1.5'>
               <span className='text-label-sm uppercase tracking-widest text-on-surface-variant'>
                 Label
               </span>
               <div className='flex items-center gap-2'>
-                <Tag size={13} style={{ color: labelData.color }} className='shrink-0' />
-                <span className='text-body-sm font-medium text-on-surface'>{labelData.name}</span>
+                <Tag size={13} style={{ color: labelColor }} className='shrink-0' />
+                <span className='text-body-sm font-medium text-on-surface'>{labelName}</span>
               </div>
             </div>
           )}
