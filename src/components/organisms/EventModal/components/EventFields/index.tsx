@@ -7,7 +7,7 @@ import { RichTextEditorRHF } from 'app/components/molecules/RichTextEditor/RichT
 import { ButtonRHF } from 'app/components/molecules/Buttons/ButtonRHF';
 import { CancelButton } from 'app/components/molecules/Buttons/CancelButton';
 import { useAppDispatch } from 'app/store';
-import { addEvent, updateEvent } from 'app/store/slices/eventSlice';
+import { updateEvent, createEventThunk } from 'app/store/slices/eventSlice';
 import { GroupPeriodDate } from 'app/components/organisms/EventModal/components/GroupPeriodDate';
 import { GroupPeriodTime } from 'app/components/organisms/EventModal/components/GroupPeriodTime';
 import { LabelSelect } from 'app/components/organisms/EventModal/components/LabelSelect';
@@ -34,10 +34,10 @@ export function EventFields({
 }: IEventFieldsProps) {
   const dispatch = useAppDispatch();
 
-  const handleSubmit = (data: EventFormData) => {
+  const handleSubmit = async (data: EventFormData) => {
     const start = data.startDate.getTime() + data.startTime;
     const end = data.endDate.getTime() + data.endTime;
-    const event = {
+    const eventData = {
       name: data.name,
       start,
       end,
@@ -46,9 +46,9 @@ export function EventFields({
       notes: data.notes,
     };
     if (data.id) {
-      dispatch(updateEvent({ id: data.id, ...event }));
+      dispatch(updateEvent({ id: data.id, ...eventData }));
     } else {
-      dispatch(addEvent({ id: crypto.randomUUID(), ...event }));
+      await dispatch(createEventThunk(eventData));
     }
     onClose();
   };

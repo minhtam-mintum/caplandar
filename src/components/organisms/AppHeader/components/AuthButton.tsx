@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { LogOut, UserCircle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from 'app/store';
 import { logout } from 'app/store/slices/authSlice';
+import { apiLogout } from 'app/services/api';
 import { Avatar } from 'app/components/atoms/Avatar';
 
 function getInitials(name: string): string {
@@ -14,12 +15,18 @@ function getInitials(name: string): string {
 
 function UserDropdown({ onClose }: { onClose: () => void }) {
   const dispatch = useAppDispatch();
-  const { user, isAnonymous } = useAppSelector((s) => s.auth);
+  const { user, isAnonymous, refreshToken } = useAppSelector((s) => s.auth);
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = useCallback(async () => {
+    const token = refreshToken;
+    if (token) {
+      try {
+        await apiLogout(token);
+      } catch {}
+    }
     dispatch(logout());
     onClose();
-  }, [dispatch, onClose]);
+  }, [dispatch, onClose, refreshToken]);
 
   const handleSignIn = useCallback(() => {
     onClose();

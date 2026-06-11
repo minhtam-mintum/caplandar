@@ -50,7 +50,10 @@ export interface EventFormData extends yup.InferType<typeof eventModalSchema> {
 
 // ─── Label options ────────────────────────────────────────────────────────────
 
-export function buildLabelOptions(labels: ILabel[], onAdd: (label: ILabel) => void): SelectItem[] {
+export function buildLabelOptions(
+  labels: ILabel[],
+  onAdd: (label: ILabel) => Promise<ILabel>,
+): SelectItem[] {
   return [
     ...labels.map((l) => ({
       option: (

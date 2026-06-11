@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { useSeekDate } from 'app/hooks/useSeekDate';
+import { useFetchForYear } from 'app/hooks/useFetchForYear';
 import { FullMonthInYear } from './components/FullMonthInYear';
 import { EventModal, type IEventModalHandle } from 'app/components/organisms/EventModal';
 import { DayDrawer, type IDayDrawerHandle } from 'app/components/organisms/DayDrawer';
@@ -39,10 +40,12 @@ export function YearView() {
     titleRef.current?.setYear(year);
   });
 
+  const fetchForYear = useFetchForYear();
   const handleSync = (newYear: number) => {
     if (!yearRef.current || !titleRef.current) return;
     yearRef.current.onSetYear(newYear);
     titleRef.current.setYear(newYear);
+    fetchForYear(newYear);
   };
   const handlePrev = () => handleSync((yearRef.current?.getYear() ?? defaultYear) - 1);
   const handleNext = () => handleSync((yearRef.current?.getYear() ?? defaultYear) + 1);

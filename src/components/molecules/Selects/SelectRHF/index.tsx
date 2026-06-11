@@ -46,7 +46,6 @@ export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFPr
   const valueItems: ItemOption[] = options.filter(
     (item): item is { option: ReactNode; value: string | number } => 'value' in item,
   );
-  const [items, setItem] = useState<ItemOption[]>(valueItems);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const didOpenRef = useRef(false);
@@ -81,12 +80,12 @@ export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFPr
   const customItems = options.filter((item): item is { custom: ReactNode } => 'custom' in item);
 
   const selectedOption =
-    items.find((item) => item.value === field.value)?.option ?? String(field.value ?? '');
+    valueItems.find((item) => item.value === field.value)?.option ?? String(field.value ?? '');
 
   const errorMessage = fieldState.error?.message;
 
   return (
-    <SelectContext.Provider value={{ setItem, select, close, items }}>
+    <SelectContext.Provider value={{ setItem: () => {}, select, close, items: valueItems }}>
       <div ref={containerRef} className='flex flex-col gap-1 relative'>
         {label && <Label>{label}</Label>}
         <ButtonField
@@ -107,7 +106,7 @@ export function SelectRHF({ name, label, options, icon, disabled }: ISelectRHFPr
         {isOpen && (
           <div className='absolute top-full left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg z-10 overflow-hidden flex flex-col'>
             <div className='overflow-y-auto max-h-52'>
-              {items.map((item) => (
+              {valueItems.map((item) => (
                 <ButtonField
                   key={String(item.value)}
                   variant='select-option'

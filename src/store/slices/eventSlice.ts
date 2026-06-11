@@ -1,5 +1,8 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { setAuth, logout } from './authSlice';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { IApiEvent } from 'app/services/api';
+import { apiCreateEvent, apiGetEvents } from 'app/services/api';
+
+import { setAuth, logout, setAnonymous } from './authSlice';
 
 export interface IEvent {
   id: string;
@@ -13,22 +16,89 @@ export interface IEvent {
 
 interface IEventState {
   items: IEvent[];
+  loading: boolean;
+  fetchedYears: number[];
 }
 
-export const EVENT_STORAGE_KEY = 'app_events';
+// ─── Mapping helpers ──────────────────────────────────────────────────────────
 
-function loadEvents(): IEvent[] {
-  try {
-    const stored = localStorage.getItem(EVENT_STORAGE_KEY);
-    if (stored) return JSON.parse(stored) as IEvent[];
-  } catch {
-    // ignore parse errors
+function resolveLabelId(labelId: string | { _id: string } | undefined): string {
+  if (!labelId) return '';
+  return typeof labelId === 'string' ? labelId : labelId._id;
+}
+
+function mapApiEventToLocal(apiEvent: IApiEvent): IEvent {
+  return {
+    id: apiEvent._id,
+    name: apiEvent.title,
+    start: new Date(apiEvent.startDate).getTime(),
+    end: new Date(apiEvent.endDate).getTime(),
+    alert: 0,
+    label: resolveLabelId(apiEvent.labelId),
+    notes: apiEvent.description ?? '',
+  };
+}
+
+export function mapLocalToApiPayload(event: Omit<IEvent, 'id'>) {
+  return {
+    title: event.name,
+    startDate: new Date(event.start).toISOString(),
+    endDate: new Date(event.end).toISOString(),
+    labelId: event.label || undefined,
+    description: event.notes || undefined,
+    allDay: false as const,
+  };
+}
+
+// ─── Thunks ───────────────────────────────────────────────────────────────────
+
+type AuthSliceState = { user: { _id: string } | null; isAnonymous: boolean };
+
+interface IFetchEventsResult {
+  events: IEvent[];
+  year: number;
+}
+
+export const fetchEventsThunk = createAsyncThunk<
+  IFetchEventsResult,
+  { from: string; to: string },
+  { state: { auth: AuthSliceState; events: IEventState } }
+>(
+  'events/fetch',
+  async (params) => {
+    const year = parseInt(params.from.slice(0, 4), 10);
+    const apiEvents = await apiGetEvents(params);
+    return { events: apiEvents.map(mapApiEventToLocal), year };
+  },
+  {
+    condition: (params, { getState }) => {
+      const { auth, events } = getState();
+      if (!auth.user || auth.isAnonymous) return false;
+      const year = parseInt(params.from.slice(0, 4), 10);
+      return !events.fetchedYears.includes(year);
+    },
+  },
+);
+
+export const createEventThunk = createAsyncThunk<
+  IEvent,
+  Omit<IEvent, 'id'>,
+  { state: { auth: AuthSliceState } }
+>('events/create', async (data, { getState }) => {
+  const { auth } = getState();
+  if (!auth.user || auth.isAnonymous) {
+    return { id: crypto.randomUUID(), ...data };
   }
-  return [];
-}
+  const apiEvent = await apiCreateEvent(mapLocalToApiPayload(data));
+  return mapApiEventToLocal(apiEvent);
+});
+
+// ─── Slice ────────────────────────────────────────────────────────────────────
 
 const initialState: IEventState = {
-  items: loadEvents(),
+  items: [],
+  loading: false,
+  fetchedYears: [],
 };
 
 const eventSlice = createSlice({
@@ -48,8 +118,36 @@ const eventSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(setAuth, (state) => { state.items = []; })
-      .addCase(logout, (state) => { state.items = []; });
+      .addCase(setAuth, (state) => {
+        state.items = [];
+        state.fetchedYears = [];
+      })
+      .addCase(logout, (state) => {
+        state.items = [];
+        state.fetchedYears = [];
+      })
+      .addCase(setAnonymous, (state) => {
+        state.items = [];
+        state.fetchedYears = [];
+      })
+      .addCase(fetchEventsThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchEventsThunk.fulfilled, (state, action) => {
+        const { events, year } = action.payload;
+        state.items = [
+          ...state.items.filter((e) => new Date(e.start).getFullYear() !== year),
+          ...events,
+        ];
+        state.fetchedYears.push(year);
+        state.loading = false;
+      })
+      .addCase(fetchEventsThunk.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(createEventThunk.fulfilled, (state, action) => {
+        state.items.push(action.payload);
+      });
   },
 });
 

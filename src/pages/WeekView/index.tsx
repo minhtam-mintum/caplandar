@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { useFetchForYear } from 'app/hooks/useFetchForYear';
 import { WeekGrid } from './components/WeekGrid';
 import { TitleWeekPage } from './components/Title';
 import { Toolbar } from 'app/components/molecules/Toolbar';
@@ -21,9 +22,12 @@ export function WeekView() {
   const onNext = useCallback(() => gridRef.current?.next(), []);
   const onToday = useCallback(() => gridRef.current?.goToday(), []);
 
+  const fetchForYear = useFetchForYear();
   const handleWeekChange = useCallback((days: Date[]) => {
     titleRef.current?.setTitle(formatWeekRange(days));
-  }, []);
+    const years = [...new Set(days.map((d) => d.getFullYear()))];
+    years.forEach(fetchForYear);
+  }, [fetchForYear]);
 
   const handleEventClick = useCallback((event: IEvent) => {
     modalRef.current?.open({

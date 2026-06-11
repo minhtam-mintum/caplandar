@@ -1,53 +1,118 @@
-import { renderHook, act } from '@testing-library/react';
-import { useLabels, type ILabel } from 'app/hooks/useLabels';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { createElement, type PropsWithChildren } from 'react';
+import { Provider } from 'react-redux';
+import { useLabels } from 'app/hooks/useLabels';
+import { makeStore } from 'app/test/utils';
+import * as api from 'app/services/api';
 
-const STORAGE_KEY = 'app_labels';
+vi.mock('app/services/api', async (importOriginal) => {
+  const original = await importOriginal<typeof import('app/services/api')>();
+  return {
+    ...original,
+    apiGetLabels: vi.fn(),
+    apiCreateLabel: vi.fn(),
+  };
+});
 
-beforeEach(() => localStorage.clear());
+function makeWrapper(store: ReturnType<typeof makeStore>) {
+  return function Wrapper({ children }: PropsWithChildren) {
+    return createElement(Provider, { store }, children);
+  };
+}
+
+const authUser = {
+  user: { _id: 'u1', userId: 'testuser', name: 'Test User' },
+  accessToken: 'tok',
+  refreshToken: 'ref',
+  isAnonymous: false,
+};
 
 describe('useLabels', () => {
-  it('returns the 5 default labels when localStorage is empty', () => {
-    const { result } = renderHook(() => useLabels());
-    expect(result.current.labels).toHaveLength(5);
-    expect(result.current.labels.map((l) => l.value)).toEqual([
-      'work', 'personal', 'health', 'learning', 'other',
+  beforeEach(() => vi.clearAllMocks());
+
+  it('returns empty labels for unauthenticated user', () => {
+    const store = makeStore();
+    const { result } = renderHook(() => useLabels(), { wrapper: makeWrapper(store) });
+    expect(result.current.labels).toEqual([]);
+    expect(api.apiGetLabels).not.toHaveBeenCalled();
+  });
+
+  it('fetches labels from API for authenticated user', async () => {
+    vi.mocked(api.apiGetLabels).mockResolvedValue([
+      { _id: 'id1', name: 'Work', color: '#FF5733' },
+      { _id: 'id2', name: 'Personal', color: '#33FF57' },
     ]);
+    const store = makeStore({ auth: authUser } as never);
+    const { result } = renderHook(() => useLabels(), { wrapper: makeWrapper(store) });
+
+    await waitFor(() => expect(result.current.labels).toHaveLength(2));
+    expect(result.current.labels[0]).toEqual({ value: 'id1', name: 'Work', color: '#FF5733' });
+    expect(result.current.labels[1]).toEqual({ value: 'id2', name: 'Personal', color: '#33FF57' });
   });
 
-  it('persists defaults to localStorage on first load', () => {
-    renderHook(() => useLabels());
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
-    expect(stored).toHaveLength(5);
+  it('returns empty labels when API fails', async () => {
+    vi.mocked(api.apiGetLabels).mockRejectedValue(new Error('Network error'));
+    const store = makeStore({ auth: authUser } as never);
+    const { result } = renderHook(() => useLabels(), { wrapper: makeWrapper(store) });
+
+    await waitFor(() => expect(api.apiGetLabels).toHaveBeenCalled());
+    expect(result.current.labels).toEqual([]);
   });
 
-  it('loads previously saved labels from localStorage', () => {
-    const saved: ILabel[] = [{ name: 'Custom', value: 'custom', color: '#000' }];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
-    const { result } = renderHook(() => useLabels());
-    expect(result.current.labels).toHaveLength(1);
-    expect(result.current.labels[0].value).toBe('custom');
-  });
+  it('addLabel for anonymous user adds to local state', async () => {
+    const store = makeStore();
+    const { result } = renderHook(() => useLabels(), { wrapper: makeWrapper(store) });
 
-  it('addLabel appends the new label to the list', () => {
-    const { result } = renderHook(() => useLabels());
-    const newLabel: ILabel = { name: 'Test', value: 'test', color: '#abc' };
-    act(() => result.current.addLabel(newLabel));
+    const newLabel = { name: 'Test', value: 'test', color: '#abc' };
+    let returned: typeof newLabel | undefined;
+    await act(async () => {
+      returned = await result.current.addLabel(newLabel);
+    });
+
     expect(result.current.labels).toContainEqual(newLabel);
-    expect(result.current.labels).toHaveLength(6);
+    expect(returned).toEqual(newLabel);
+    expect(api.apiCreateLabel).not.toHaveBeenCalled();
   });
 
-  it('addLabel persists the updated list to localStorage', () => {
-    const { result } = renderHook(() => useLabels());
-    const newLabel: ILabel = { name: 'Test', value: 'test', color: '#abc' };
-    act(() => result.current.addLabel(newLabel));
-    const stored: ILabel[] = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
-    expect(stored).toContainEqual(newLabel);
+  it('addLabel for authenticated user calls API and uses returned id', async () => {
+    vi.mocked(api.apiGetLabels).mockResolvedValue([]);
+    vi.mocked(api.apiCreateLabel).mockResolvedValue({
+      _id: 'server-id',
+      name: 'Test',
+      color: '#abc',
+    });
+    const store = makeStore({ auth: authUser } as never);
+    const { result } = renderHook(() => useLabels(), { wrapper: makeWrapper(store) });
+    await waitFor(() => expect(api.apiGetLabels).toHaveBeenCalled());
+
+    let returned: { value: string; name: string; color: string } | undefined;
+    await act(async () => {
+      returned = await result.current.addLabel({ name: 'Test', value: 'temp', color: '#abc' });
+    });
+
+    expect(api.apiCreateLabel).toHaveBeenCalledWith({ name: 'Test', color: '#abc' });
+    expect(result.current.labels).toContainEqual({ value: 'server-id', name: 'Test', color: '#abc' });
+    expect(returned).toEqual({ value: 'server-id', name: 'Test', color: '#abc' });
   });
 
-  it('addLabel preserves existing labels', () => {
-    const { result } = renderHook(() => useLabels());
-    const initial = result.current.labels[0];
-    act(() => result.current.addLabel({ name: 'New', value: 'new', color: '#fff' }));
-    expect(result.current.labels[0]).toEqual(initial);
+  it('addLabel preserves existing labels', async () => {
+    vi.mocked(api.apiGetLabels).mockResolvedValue([
+      { _id: 'id1', name: 'Work', color: '#FF5733' },
+    ]);
+    vi.mocked(api.apiCreateLabel).mockResolvedValue({
+      _id: 'id2',
+      name: 'New',
+      color: '#fff',
+    });
+    const store = makeStore({ auth: authUser } as never);
+    const { result } = renderHook(() => useLabels(), { wrapper: makeWrapper(store) });
+    await waitFor(() => expect(result.current.labels).toHaveLength(1));
+
+    await act(async () => {
+      await result.current.addLabel({ name: 'New', value: 'new', color: '#fff' });
+    });
+
+    expect(result.current.labels[0]).toEqual({ value: 'id1', name: 'Work', color: '#FF5733' });
+    expect(result.current.labels).toHaveLength(2);
   });
 });

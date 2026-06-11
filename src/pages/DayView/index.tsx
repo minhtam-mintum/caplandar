@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { useFetchForYear } from 'app/hooks/useFetchForYear';
 import { DayTimeGrid, type IDayTimeGridHandle } from './components/DayTimeGrid';
 import { TitleDayPage } from './components/Title';
 import { Toolbar } from 'app/components/molecules/Toolbar';
@@ -19,9 +20,11 @@ export function DayView() {
   const onNext  = useCallback(() => gridRef.current?.next(), []);
   const onToday = useCallback(() => gridRef.current?.goToday(), []);
 
+  const fetchForYear = useFetchForYear();
   const handleDateChange = useCallback((date: Date) => {
     titleRef.current?.setDate(date);
-  }, []);
+    fetchForYear(date.getFullYear());
+  }, [fetchForYear]);
 
   const handleEventClick = useCallback((event: IEvent) => {
     modalRef.current?.open({

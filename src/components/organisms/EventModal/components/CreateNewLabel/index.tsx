@@ -16,7 +16,7 @@ const COLORS = [
 ];
 
 interface ICreateNewLabelProps {
-  onAdd: (label: ILabel) => void;
+  onAdd: (label: ILabel) => Promise<ILabel>;
 }
 
 export function CreateNewLabel({ onAdd }: ICreateNewLabelProps) {
@@ -30,15 +30,15 @@ export function CreateNewLabel({ onAdd }: ICreateNewLabelProps) {
     if (isAdding) inputRef.current?.focus();
   }, [isAdding]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const trimmed = value.trim();
     if (trimmed) {
       const label: ILabel = { name: trimmed, value: trimmed, color };
-      onAdd(label);
+      const created = await onAdd(label);
       setItem([
         ...items,
         {
-          value: trimmed,
+          value: created.value,
           option: (
             <span className='flex items-center gap-2'>
               <Tag size={12} style={{ color }} />
@@ -92,14 +92,14 @@ export function CreateNewLabel({ onAdd }: ICreateNewLabelProps) {
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
-              handleConfirm();
+              void handleConfirm();
             }
             if (e.key === 'Escape') handleCancel();
           }}
           placeholder='Label name…'
           className='flex-1 text-body-md bg-transparent outline-none text-on-surface placeholder:text-on-surface-variant/50'
         />
-        <ButtonField variant='action-icon' type='button' onClick={handleConfirm} className='text-primary'>
+        <ButtonField variant='action-icon' type='button' onClick={() => void handleConfirm()} className='text-primary'>
           <Check size={14} />
         </ButtonField>
         <ButtonField variant='action-icon' type='button' onClick={handleCancel} className='text-on-surface-variant'>

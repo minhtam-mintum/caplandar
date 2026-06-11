@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { useFetchForYear } from 'app/hooks/useFetchForYear';
 import { EventModal, type IEventModalHandle } from 'app/components/organisms/EventModal';
 import { DayDrawer, type IDayDrawerHandle } from 'app/components/organisms/DayDrawer';
 import { Toolbar } from 'app/components/molecules/Toolbar';
@@ -48,10 +49,12 @@ export function MonthView() {
     titleRef.current?.setTitle(formatTitle(d));
   });
 
+  const fetchForYear = useFetchForYear();
   const handleSync = (newDate: Date) => {
     dateCursor.current = newDate;
     gridRef.current?.updateMonth(newDate.getFullYear(), newDate.getMonth());
     titleRef.current?.setTitle(formatTitle(newDate));
+    fetchForYear(newDate.getFullYear());
   };
   const handlePrev = () => {
     const d = new Date(dateCursor.current);

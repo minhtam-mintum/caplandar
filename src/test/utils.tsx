@@ -5,11 +5,12 @@ import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import eventReducer from 'app/store/slices/eventSlice';
 import notificationReducer from 'app/store/slices/notificationSlice';
+import authReducer from 'app/store/slices/authSlice';
 import type { RootState } from 'app/store';
 
 export function makeStore(preloadedState?: Partial<RootState>) {
   return configureStore({
-    reducer: { events: eventReducer, notifications: notificationReducer },
+    reducer: { events: eventReducer, notifications: notificationReducer, auth: authReducer },
     preloadedState: preloadedState as RootState,
   });
 }
