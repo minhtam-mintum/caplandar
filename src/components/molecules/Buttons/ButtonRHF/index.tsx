@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react';
 import { type FieldValues, type FormState, useFormContext } from 'react-hook-form';
+import { Loader2 } from 'lucide-react';
 import { Button } from 'app/components/atoms/Button';
 
 interface IButtonRHFProps extends Omit<ComponentProps<typeof Button>, 'children'> {
@@ -19,7 +20,12 @@ export function ButtonRHF({ disabled, className = '', render, children, ...butto
       disabled={isDisabled}
       className={`${isDisabled ? 'opacity-40 cursor-not-allowed grayscale' : ''} ${className}`}
     >
-      {render ? render(formState) : children}
+      {isSubmitting ? (
+        <span className='flex items-center gap-1.5'>
+          <Loader2 size={14} className='animate-spin' />
+          {render ? render(formState) : children}
+        </span>
+      ) : render ? render(formState) : children}
     </Button>
   );
 }
