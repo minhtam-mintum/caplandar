@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { apiGetLabels, apiCreateLabel } from 'app/services/api';
 import { setAuth, logout, setAnonymous } from './authSlice';
 
@@ -41,7 +41,7 @@ export const addLabelThunk = createAsyncThunk<
   { state: { auth: AuthSliceState } }
 >('labels/add', async (label, { getState }) => {
   const { auth } = getState();
-  if (!auth.user || auth.isAnonymous) return label;
+  if (!auth.user || auth.isAnonymous) return { ...label, value: crypto.randomUUID() };
   const created = await apiCreateLabel({ name: label.name, color: label.color });
   return { value: created._id, name: created.name, color: created.color };
 });
@@ -55,7 +55,11 @@ const initialState: ILabelState = {
 const labelSlice = createSlice({
   name: 'labels',
   initialState,
-  reducers: {},
+  reducers: {
+    setLabels: (state, action: PayloadAction<ILabel[]>) => {
+      state.items = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(setAuth, (state) => {
@@ -90,4 +94,5 @@ const labelSlice = createSlice({
   },
 });
 
+export const { setLabels } = labelSlice.actions;
 export default labelSlice.reducer;

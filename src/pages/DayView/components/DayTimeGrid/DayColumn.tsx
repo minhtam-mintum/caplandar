@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useMemo } from 'react';
 import { cn } from 'app/utils/cn';
 import { useAppDispatch, useAppSelector } from 'app/store';
-import { updateEvent } from 'app/store/slices/eventSlice';
+import { updateEventThunk } from 'app/store/slices/eventSlice';
 import type { IEvent } from 'app/store/slices/eventSlice';
 import { DAY_END_HOUR, DAY_HOUR_HEIGHT, DAY_START_HOUR } from 'app/utils/day';
 import { timeToOffset, durationToHeight, getCurrentTimeOffset } from 'app/utils';
@@ -97,7 +97,7 @@ export const DayColumn = ({
       setResizeTarget((rt) => {
         if (rt) {
           const event = events.find((ev) => ev.id === rt.id);
-          if (event) dispatch(updateEvent({ ...event, end: rt.newEndMs }));
+          if (event) dispatch(updateEventThunk({ ...event, end: rt.newEndMs }));
         }
         return null;
       });
@@ -160,7 +160,7 @@ export const DayColumn = ({
     if (event) {
       const durationMs =
         dragState.type === 'timed' ? dragState.durationMs : DEFAULT_TIMED_DURATION;
-      dispatch(updateEvent({ ...event, start: dragTarget, end: dragTarget + durationMs }));
+      dispatch(updateEventThunk({ ...event, start: dragTarget, end: dragTarget + durationMs }));
     }
     resetDrag();
   };

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { cn } from 'app/utils/cn';
 import { useAppDispatch, useAppSelector } from 'app/store';
-import { updateEvent } from 'app/store/slices/eventSlice';
+import { updateEventThunk } from 'app/store/slices/eventSlice';
 import type { IEvent } from 'app/store/slices/eventSlice';
 import { ALL_DAY_GAP, ALL_DAY_PAD, ALL_DAY_ROW_H, DEFAULT_COLOR } from 'app/pages/WeekView/const';
 import { DAY_MS } from 'app/pages/MonthView/utils';
@@ -61,7 +61,7 @@ export const DayAllDayRow = ({
       if (event) {
         const [y, m, d] = dateStr.split('-').map(Number);
         const newStartMs = Date.UTC(y, m - 1, d);
-        dispatch(updateEvent({ ...event, start: newStartMs, end: newStartMs + DAY_MS }));
+        dispatch(updateEventThunk({ ...event, start: newStartMs, end: newStartMs + DAY_MS }));
       }
     }
     setDropActive(false);

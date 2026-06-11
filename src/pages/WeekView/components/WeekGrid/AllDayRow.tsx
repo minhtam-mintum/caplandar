@@ -4,7 +4,7 @@ import { dayToDateStr } from 'app/pages/WeekView/utils';
 import { DAY_MS, MAX_LANES } from 'app/pages/MonthView/utils';
 import { ALL_DAY_GAP, ALL_DAY_PAD, ALL_DAY_ROW_H, DEFAULT_COLOR } from 'app/pages/WeekView/const';
 import { useAppDispatch, useAppSelector } from 'app/store';
-import { updateEvent } from 'app/store/slices/eventSlice';
+import { updateEventThunk } from 'app/store/slices/eventSlice';
 import type { IEvent } from 'app/store/slices/eventSlice';
 import type { BarItem } from 'app/pages/MonthView/types';
 import type { DragInfo } from 'app/pages/WeekView/types';
@@ -99,7 +99,7 @@ export const AllDayRow = ({
           shifted.getDate(),
         );
         dispatch(
-          updateEvent({ ...event, start: newStartUtcMs, end: newStartUtcMs + (event.end - event.start) }),
+          updateEventThunk({ ...event, start: newStartUtcMs, end: newStartUtcMs + (event.end - event.start) }),
         );
       } else {
         const newStartUtcMs = Date.UTC(
@@ -107,7 +107,7 @@ export const AllDayRow = ({
           cellDate.getMonth(),
           cellDate.getDate(),
         );
-        dispatch(updateEvent({ ...event, start: newStartUtcMs, end: newStartUtcMs + DAY_MS }));
+        dispatch(updateEventThunk({ ...event, start: newStartUtcMs, end: newStartUtcMs + DAY_MS }));
       }
     }
     onDragEnd();

@@ -19,7 +19,7 @@ import {
 import { durationToHeight, getCurrentTimeOffset, timeToOffset } from 'app/utils';
 import { WeekEventCard } from 'app/components/molecules/WeekEventCard';
 import { useAppDispatch, useAppSelector } from 'app/store';
-import { updateEvent } from 'app/store/slices/eventSlice';
+import { updateEventThunk } from 'app/store/slices/eventSlice';
 import type { IEvent } from 'app/store/slices/eventSlice';
 import type { DragInfo } from 'app/pages/WeekView/types';
 
@@ -114,7 +114,7 @@ export const TimeGrid = ({
       setResizeTarget((rt) => {
         if (rt) {
           const event = events.find((ev) => ev.id === ri.id);
-          if (event) dispatch(updateEvent({ ...event, end: rt.newEndMs }));
+          if (event) dispatch(updateEventThunk({ ...event, end: rt.newEndMs }));
         }
         return null;
       });
@@ -177,7 +177,7 @@ export const TimeGrid = ({
     if (event) {
       const durationMs = dragInfo.type === 'timed' ? dragInfo.durationMs : DEFAULT_TIMED_DURATION;
       dispatch(
-        updateEvent({
+        updateEventThunk({
           ...event,
           start: dragTarget.newStartMs,
           end: dragTarget.newStartMs + durationMs,

@@ -7,7 +7,7 @@ import {
 import type { IWeekCell } from 'app/components/molecules/Calendar/types';
 import { cn } from 'app/utils/cn';
 import { toDateStr } from 'app/utils/calendar';
-import { updateEvent } from 'app/store/slices/eventSlice';
+import { updateEventThunk } from 'app/store/slices/eventSlice';
 import { useAppDispatch, useAppSelector } from 'app/store';
 import { useLabels } from 'app/hooks/useLabels';
 import type {
@@ -103,7 +103,7 @@ export const MonthViewGrid = forwardRef<IMonthViewGridHandle, IMonthViewGridProp
       const event = events.find((ev) => ev.id === dragInfo.id);
       if (event) {
         const duration = event.end - event.start;
-        dispatch(updateEvent({ ...event, start: newStartUtcMs, end: newStartUtcMs + duration }));
+        dispatch(updateEventThunk({ ...event, start: newStartUtcMs, end: newStartUtcMs + duration }));
       }
       setDragInfo(null);
       setDragOverDs(null);
