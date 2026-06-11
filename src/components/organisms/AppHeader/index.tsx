@@ -8,6 +8,7 @@ import { Logo } from 'app/components/atoms/Logo';
 import { EventModal, IEventModalHandle, type EventFormData } from 'app/components/organisms/EventModal';
 import { AuthButton } from './components/AuthButton';
 import { CalendarNavTabs, type ICalendarNavTabsHandle } from './components/CalendarNavTabs';
+import { DarkModeToggle } from './components/DarkModeToggle';
 import { EventSearch } from './components/EventSearch';
 import { NotificationPanel } from './components/NotificationPanel';
 
@@ -58,6 +59,7 @@ export function AppHeader() {
                 <Plus size={15} />
                 Create Event
               </Button>
+              <DarkModeToggle />
               <NotificationPanel onEventClick={handleEventClick} />
               <AuthButton />
             </div>

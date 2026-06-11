@@ -7,7 +7,18 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#3730a3" />
+    <meta name="theme-color" content="#3730a3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#2c269b" media="(prefers-color-scheme: dark)" />
+    <script>
+      (function () {
+        try {
+          var s = localStorage.getItem('theme');
+          if (s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Caplander</title>
     <link rel="preload" href="/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
@@ -53,6 +64,10 @@
         transform-origin: left center;
         animation: splash-bar 1.4s ease-in-out infinite;
       }
+      .dark #splash { background: #191c1e; }
+      .dark #splash span { color: #c3c0ff; }
+      .dark #splash-track { background: #2c2f31; }
+      .dark #splash-bar { background: #c3c0ff; }
       @keyframes splash-bar {
         0%   { transform: translateX(-100%) scaleX(0.3); }
         50%  { transform: translateX(0%)    scaleX(0.6); }
