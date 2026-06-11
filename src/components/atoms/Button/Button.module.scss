@@ -36,6 +36,10 @@
   @apply px-4 py-2 rounded-xl text-body-md text-on-surface-variant hover:bg-surface-container;
 }
 
+.incognito {
+  @apply w-full justify-center gap-2.5 px-4 py-2.5 rounded-xl border border-outline-variant text-on-surface hover:bg-surface-container-high;
+}
+
 .dashed {
   @apply justify-center w-full py-4 rounded-xl border-2 border-dashed border-outline-variant text-body-sm text-on-surface-variant hover:border-primary hover:text-primary;
 }

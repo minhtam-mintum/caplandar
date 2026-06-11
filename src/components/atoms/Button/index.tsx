@@ -17,7 +17,8 @@ type Variant =
   | 'time-item'
   | 'swatch'
   | 'action-icon'
-  | 'label-action';
+  | 'label-action'
+  | 'incognito';
 
 interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
