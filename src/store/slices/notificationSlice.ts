@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { setAuth, logout } from './authSlice';
 
 const NOTIFICATION_READ_KEY = 'app_notification_read';
 
@@ -36,6 +37,11 @@ const notificationSlice = createSlice({
         if (!state.readIds.includes(id)) state.readIds.push(id);
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(setAuth, (state) => { state.readIds = []; state.notifiedIds = []; })
+      .addCase(logout, (state) => { state.readIds = []; state.notifiedIds = []; });
   },
 });
 

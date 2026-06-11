@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { setAuth, logout } from './authSlice';
 
 export interface IEvent {
   id: string;
@@ -44,6 +45,11 @@ const eventSlice = createSlice({
     removeEvent: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter((e) => e.id !== action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(setAuth, (state) => { state.items = []; })
+      .addCase(logout, (state) => { state.items = []; });
   },
 });
 
