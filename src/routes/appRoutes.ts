@@ -35,4 +35,11 @@ export const appRoutes: AppRoute[] = [
       return { Component: DayView };
     },
   },
+  {
+    path: ROUTES.PROFILE,
+    lazy: async () => {
+      const { ProfilePage } = await import('app/pages/ProfilePage');
+      return { Component: ProfilePage };
+    },
+  },
 ];

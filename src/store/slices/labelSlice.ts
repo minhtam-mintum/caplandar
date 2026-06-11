@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { apiGetLabels, apiCreateLabel } from 'app/services/api';
+import { apiGetLabels, apiCreateLabel, apiUpdateLabel, apiDeleteLabel } from 'app/services/api';
 import { setAuth, logout, setAnonymous } from './authSlice';
 
 export interface ILabel {
@@ -46,6 +46,28 @@ export const addLabelThunk = createAsyncThunk<
   return { value: created._id, name: created.name, color: created.color };
 });
 
+export const updateLabelThunk = createAsyncThunk<
+  ILabel,
+  { id: string; name: string; color: string },
+  { state: { auth: AuthSliceState } }
+>('labels/update', async ({ id, name, color }, { getState }) => {
+  const { auth } = getState();
+  if (!auth.user || auth.isAnonymous) return { value: id, name, color };
+  const updated = await apiUpdateLabel(id, { name, color });
+  return { value: updated._id, name: updated.name, color: updated.color };
+});
+
+export const deleteLabelThunk = createAsyncThunk<
+  string,
+  string,
+  { state: { auth: AuthSliceState } }
+>('labels/delete', async (id, { getState }) => {
+  const { auth } = getState();
+  if (!auth.user || auth.isAnonymous) return id;
+  await apiDeleteLabel(id);
+  return id;
+});
+
 const initialState: ILabelState = {
   items: [],
   loading: false,
@@ -90,6 +112,13 @@ const labelSlice = createSlice({
       })
       .addCase(addLabelThunk.fulfilled, (state, action) => {
         state.items.push(action.payload);
+      })
+      .addCase(updateLabelThunk.fulfilled, (state, action) => {
+        const idx = state.items.findIndex((l) => l.value === action.payload.value);
+        if (idx !== -1) state.items[idx] = action.payload;
+      })
+      .addCase(deleteLabelThunk.fulfilled, (state, action) => {
+        state.items = state.items.filter((l) => l.value !== action.payload);
       });
   },
 });

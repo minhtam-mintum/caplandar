@@ -1,19 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Loader2, Plus, Tag, X } from 'lucide-react';
 import { ButtonField } from 'app/components/molecules/Buttons/ButtonField';
+import { ColorPicker, DEFAULT_COLOR } from 'app/components/molecules/ColorPicker';
 import { useSelectContext } from 'app/components/molecules/Selects/SelectRHF';
 import type { ILabel } from 'app/hooks/useLabels';
-
-const COLORS = [
-  '#ef4444',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#3b82f6',
-  '#8b5cf6',
-  '#ec4899',
-  '#14b8a6',
-];
 
 interface ICreateNewLabelProps {
   onAdd: (label: ILabel) => Promise<ILabel>;
@@ -24,7 +14,7 @@ export function CreateNewLabel({ onAdd }: ICreateNewLabelProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [value, setValue] = useState('');
-  const [color, setColor] = useState(COLORS[0]);
+  const [color, setColor] = useState(DEFAULT_COLOR);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -77,22 +67,7 @@ export function CreateNewLabel({ onAdd }: ICreateNewLabelProps) {
 
   return (
     <div className='flex flex-col px-4 py-2.5 gap-2'>
-      <div className='flex items-center gap-1.5'>
-        {COLORS.map((c) => (
-          <ButtonField
-            key={c}
-            variant='swatch'
-            type='button'
-            onClick={() => setColor(c)}
-            disabled={isCreating}
-            style={{ background: c }}
-            className={
-              color === c
-                ? 'ring-2 ring-offset-1 ring-outline-variant scale-110'
-                : 'hover:scale-110'
-            }></ButtonField>
-        ))}
-      </div>
+      <ColorPicker selected={color} onChange={setColor} disabled={isCreating} />
       <div className='flex items-center gap-2'>
         <Tag size={13} style={{ color }} className='shrink-0' />
         <input

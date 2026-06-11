@@ -57,6 +57,9 @@ const authSlice = createSlice({
       state.isAnonymous = false;
       clearTokens();
     },
+    updateUser: (state, action: PayloadAction<IUser>) => {
+      state.user = action.payload;
+    },
     updateTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
@@ -64,5 +67,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAuth, setAnonymous, logout, updateTokens } = authSlice.actions;
+export const { setAuth, setAnonymous, logout, updateTokens, updateUser } = authSlice.actions;
 export default authSlice.reducer;

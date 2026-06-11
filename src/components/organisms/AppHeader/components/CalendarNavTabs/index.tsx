@@ -18,7 +18,7 @@ export interface ICalendarNavTabsHandle {
 export const CalendarNavTabs = forwardRef<ICalendarNavTabsHandle>(function CalendarNavTabs(_, ref) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const activeView = CALENDAR_TABS.some((t) => t.id === pathname) ? pathname : ROUTES.MONTH;
+  const activeView = CALENDAR_TABS.some((t) => t.id === pathname) ? pathname : '';
 
   useImperativeHandle(ref, () => ({ getActiveView: () => activeView }), [activeView]);
 

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { LogOut, UserCircle } from 'lucide-react';
+import { LogOut, UserCircle, UserRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/store';
 import { logout } from 'app/store/slices/authSlice';
 import { apiLogout } from 'app/services/api';
 import { Avatar } from 'app/components/atoms/Avatar';
+import { ROUTES } from 'app/constants/route';
 
 function getInitials(name: string): string {
   return name
@@ -42,6 +44,13 @@ function UserDropdown({ onClose }: { onClose: () => void }) {
               <p className='text-body-sm font-medium text-on-surface truncate'>{user.name}</p>
               <p className='text-label-sm text-on-surface-variant truncate'>@{user.userId}</p>
             </div>
+            <Link
+              to={ROUTES.PROFILE}
+              onClick={onClose}
+              className='w-full flex items-center gap-2.5 px-4 py-2.5 text-body-sm text-on-surface hover:bg-surface-container-high transition-colors'>
+              <UserRound size={15} className='text-on-surface-variant' />
+              Profile
+            </Link>
             <button
               className='w-full flex items-center gap-2.5 px-4 py-2.5 text-body-sm text-on-surface hover:bg-surface-container-high transition-colors'
               onClick={handleLogout}>

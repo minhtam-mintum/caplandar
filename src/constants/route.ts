@@ -6,4 +6,5 @@ export const ROUTES = {
   DAY:      '/day',
   LOGIN:    '/login',
   REGISTER: '/register',
+  PROFILE:  '/profile',
 } as const
